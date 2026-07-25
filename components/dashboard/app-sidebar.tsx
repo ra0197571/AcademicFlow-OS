@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation" // URL check karne ke liye
+import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard, 
   Users, 
@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 
-// 1. Roles ke mutabiq alag data define karein
 const navigationData = {
   admin: {
     roleName: "Principal",
@@ -73,12 +72,18 @@ const navigationData = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname() // Current URL lene ke liye
+  const pathname = usePathname()
 
-  // 2. Logic: Pata lagayein ke user kis role mein hai
-  let currentRole: 'admin' | 'teacher' | 'student' = 'admin' // Default
-  if (pathname.includes("/teacher")) currentRole = 'teacher'
-  if (pathname.includes("/student")) currentRole = 'student'
+  // --- SAHI LOGIC: Path ke shuruat se check karein ---
+  let currentRole: 'admin' | 'teacher' | 'student' = 'admin'
+  
+  if (pathname.startsWith("/teacher")) {
+    currentRole = 'teacher'
+  } else if (pathname.startsWith("/student")) {
+    currentRole = 'student'
+  } else {
+    currentRole = 'admin'
+  }
 
   const activeMenu = navigationData[currentRole]
 
@@ -94,7 +99,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </span>
         </div>
         
-        {/* Sirf Admin ko payroll lock dikhayein */}
         {currentRole === 'admin' && (
           <Button 
             variant="default" 
@@ -117,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <Link href={item.url} className="w-full">
                   <SidebarMenuButton 
                     tooltip={item.title} 
-                    isActive={pathname === item.url} // Active link highlight karne ke liye
+                    isActive={pathname === item.url}
                     className={`hover:bg-indigo-50 hover:text-indigo-600 transition-all py-6 rounded-xl ${pathname === item.url ? 'bg-indigo-50 text-indigo-600' : ''}`}
                   >
                     <item.icon className="size-4" />
@@ -152,10 +156,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Profile Section - Role ke mutabiq badal jayegi */}
       <div className="p-4 border-t bg-white group-data-[collapsible=icon]:hidden">
         <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
-          <div className={`size-8 rounded-full flex items-center justify-center text-white font-bold text-xs uppercase ${currentRole === 'admin' ? 'bg-indigo-600' : currentRole === 'teacher' ? 'bg-green-600' : 'bg-orange-600'}`}>
+          <div className={`size-8 rounded-full flex items-center justify-center text-white font-bold text-xs uppercase ${
+            currentRole === 'admin' ? 'bg-indigo-600' : 
+            currentRole === 'teacher' ? 'bg-green-600' : 'bg-orange-600'
+          }`}>
             {activeMenu.roleName.substring(0, 2)}
           </div>
           <div className="flex-1">

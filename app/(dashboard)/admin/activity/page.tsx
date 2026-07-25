@@ -1,11 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AppSidebar } from "@/components/dashboard/app-sidebar"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Filter, Download, Clock, CheckCircle2 } from "lucide-react"
+import { Search, Filter, Download, Clock, CheckCircle2, History } from "lucide-react"
 
 const activities = [
   { id: 1, user: "Principal Ali", action: "locked the payroll", target: "May 2026", time: "2 mins ago", type: "system" },
@@ -18,7 +16,6 @@ const activities = [
 export default function ActivityPage() {
   const [mounted, setMounted] = useState(false)
 
-  // Hydration safety check
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -26,9 +23,7 @@ export default function ActivityPage() {
   if (!mounted) return null
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F8FAFC]">
         {/* --- HEADER --- */}
         <header className="h-16 flex items-center justify-between px-8 bg-white border-b sticky top-0 z-20">
           <div className="flex items-center gap-4">
@@ -36,27 +31,34 @@ export default function ActivityPage() {
             <Badge className="bg-indigo-50 text-indigo-600 border-none font-bold">Realtime Sync</Badge>
           </div>
           <div className="flex gap-3">
-             <button className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all border-none"><Filter size={20}/></button>
-             <button className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all border-none"><Download size={20}/></button>
+             <button className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all border-none">
+                <Filter size={20}/>
+             </button>
+             <button className="p-2.5 bg-slate-50 text-slate-400 rounded-xl hover:bg-slate-100 transition-all border-none">
+                <Download size={20}/>
+             </button>
           </div>
         </header>
 
-        <main className="p-8 max-w-5xl mx-auto">
+        <main className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
           {/* --- SEARCH & QUICK STATS --- */}
-          <div className="mb-8 flex justify-between items-center bg-white p-6 rounded-[28px] shadow-sm border border-slate-100">
-             <div className="relative flex-1 max-w-md">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white p-6 rounded-[28px] shadow-sm border border-slate-100">
+             <div className="relative flex-1 w-full max-w-md">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                <input placeholder="Search events..." className="w-full pl-12 h-12 bg-slate-50 border-none rounded-2xl text-sm outline-none focus:ring-2 ring-indigo-100 transition-all" />
+                <input 
+                  placeholder="Search events..." 
+                  className="w-full pl-12 h-12 bg-slate-50 border-none rounded-2xl text-sm outline-none focus:ring-2 ring-indigo-500/20 transition-all" 
+                />
              </div>
-             <div className="flex gap-8 px-6 border-l border-slate-100 ml-6">
-                <div>
+             
+             <div className="flex gap-8 px-6 border-l border-slate-100">
+                <div className="text-center">
                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Today</p>
-                   <p className="text-xl font-bold text-slate-800 tracking-tight">142 <span className="text-xs text-emerald-500 font-bold">Events</span></p>
+                   <p className="text-xl font-bold text-slate-800">142 <span className="text-xs text-emerald-500 font-bold">Events</span></p>
                 </div>
-                <div>
+                <div className="text-center">
                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Status</p>
-                   {/* FIXED: Changed <p> to <div> to avoid HTML nesting error */}
-                   <div className="text-xl font-bold text-slate-800 flex items-center gap-2 tracking-tight">
+                   <div className="text-xl font-bold text-slate-800 flex items-center gap-2">
                       Online <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                    </div>
                 </div>
@@ -71,12 +73,12 @@ export default function ActivityPage() {
                       <div className="relative">
                          <Avatar className="size-12 rounded-2xl border-2 border-slate-50">
                             <AvatarImage src={`https://i.pravatar.cc/100?u=${item.id}`} />
-                            <AvatarFallback>{item.user[0]}</AvatarFallback>
+                            <AvatarFallback className="bg-indigo-50 text-indigo-600 font-bold">{item.user[0]}</AvatarFallback>
                          </Avatar>
                          <div className="absolute -bottom-1 -right-1 size-5 rounded-lg bg-white shadow-sm flex items-center justify-center">
                             {item.type === 'attendance' ? <CheckCircle2 size={12} className="text-emerald-500" /> : 
                              item.type === 'fee' ? <div className="size-2 bg-amber-500 rounded-full" /> :
-                             <Clock size={12} className="text-indigo-500" />}
+                             <History size={12} className="text-indigo-500" />}
                          </div>
                       </div>
                       
@@ -88,7 +90,7 @@ export default function ActivityPage() {
                       </div>
                    </div>
 
-                   <div className="text-right">
+                   <div className="text-right flex flex-col items-end">
                       <p className="text-[11px] font-bold text-slate-300 uppercase tracking-tighter mb-1">{item.time}</p>
                       <Badge variant="outline" className="rounded-lg border-slate-100 bg-slate-50 text-[10px] font-black text-slate-400 px-2 py-0">
                          {item.type.toUpperCase()}
@@ -97,12 +99,11 @@ export default function ActivityPage() {
                 </div>
              ))}
 
-             <button className="w-full py-4 text-slate-300 font-bold text-sm hover:text-indigo-500 transition-colors uppercase tracking-widest border-none bg-transparent cursor-pointer">
-                Load More History
+             <button className="w-full py-6 text-slate-300 font-black text-xs hover:text-indigo-500 transition-colors uppercase tracking-[0.2em] border-none bg-transparent cursor-pointer">
+                View Full Audit Trail
              </button>
           </div>
         </main>
-      </SidebarInset>
-    </SidebarProvider>
+    </div>
   )
 }
