@@ -1,9 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/dashboard/app-sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +16,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-[#F8FAFC] antialiased`}>
         <TooltipProvider>
-          {/* Sidebar yahan rakhne se ye har page par nazar aayega */}
-          <SidebarProvider>
-            <AppSidebar />
-            <div className="flex-1 flex flex-col min-h-screen">
-              {children}
-            </div>
-          </SidebarProvider>
+          {/* Yahan se sidebar nikal diya hai taake login page clean rahe */}
+          {children}
         </TooltipProvider>
       </body>
     </html>

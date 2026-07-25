@@ -1,25 +1,32 @@
 "use client"
 
+import * as React from "react"
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress"
-
 import { cn } from "@/lib/utils"
+
+// Humne yahan 'indicatorClassName' prop add kiya hai
+interface ProgressProps extends ProgressPrimitive.Root.Props {
+  indicatorClassName?: string
+}
 
 function Progress({
   className,
   children,
   value,
+  indicatorClassName, // Isse yahan receive kiya
   ...props
-}: ProgressPrimitive.Root.Props) {
+}: ProgressProps) {
   return (
     <ProgressPrimitive.Root
       value={value}
       data-slot="progress"
-      className={cn("flex flex-wrap gap-3", className)}
+      className={cn("flex flex-col gap-2 w-full", className)}
       {...props}
     >
       {children}
       <ProgressTrack>
-        <ProgressIndicator />
+        {/* Isse yahan pass kiya taake color asali bar par apply ho */}
+        <ProgressIndicator className={indicatorClassName} />
       </ProgressTrack>
     </ProgressPrimitive.Root>
   )
@@ -29,7 +36,7 @@ function ProgressTrack({ className, ...props }: ProgressPrimitive.Track.Props) {
   return (
     <ProgressPrimitive.Track
       className={cn(
-        "relative flex h-1 w-full items-center overflow-x-hidden rounded-full bg-muted",
+        "relative flex h-2 w-full items-center overflow-hidden rounded-full bg-slate-100",
         className
       )}
       data-slot="progress-track"
@@ -45,12 +52,13 @@ function ProgressIndicator({
   return (
     <ProgressPrimitive.Indicator
       data-slot="progress-indicator"
-      className={cn("h-full bg-primary transition-all", className)}
+      className={cn("h-full bg-primary transition-all duration-500", className)}
       {...props}
     />
   )
 }
 
+// Baaki components (Label, Value) ko waise hi rehne dein
 function ProgressLabel({ className, ...props }: ProgressPrimitive.Label.Props) {
   return (
     <ProgressPrimitive.Label
