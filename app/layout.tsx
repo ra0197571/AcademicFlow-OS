@@ -13,10 +13,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${inter.className} bg-[#F8FAFC] antialiased`}>
         <TooltipProvider>
-          {/* Yahan se sidebar nikal diya hai taake login page clean rahe */}
           {children}
         </TooltipProvider>
       </body>

@@ -15,7 +15,12 @@ import {
   PenTool,
   CheckSquare,
   FileText,
-  UserCircle
+  UserCircle,
+  Building2,
+  ShieldCheck,
+  CalendarIcon,
+  Book,
+  Settings
 } from "lucide-react"
 
 import {
@@ -44,6 +49,14 @@ const navigationData = {
       { title: "Students", url: "/admin/students", icon: GraduationCap },
       { title: "Teachers", url: "/admin/teachers", icon: Users },
       { title: "Fees & Payroll", url: "/admin/fees", icon: Wallet },
+      { title: "Campuses", url: "/admin/campuses", icon: Building2 },
+      // management section mein add karein
+      // management section mein add karein
+      { title: "Subjects", url: "/admin/subjects", icon: Book },
+      { title: "Timetable", url: "/admin/timetable", icon: CalendarIcon },
+      { title: "Exams", url: "/admin/exams", icon: FileText },
+      { title: "Permissions", url: "/admin/permissions", icon: ShieldCheck },
+      { title: "Settings", url: "/admin/settings", icon: Settings },
     ],
   },
   teacher: {
@@ -89,26 +102,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props} className="border-r border-slate-200">
-      <SidebarHeader className="h-20 flex items-center px-4 border-b bg-white gap-2">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="size-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-indigo-100">
-            AF
-          </div>
-          <span className="font-bold text-slate-900 group-data-[collapsible=icon]:hidden tracking-tight">
-            AcademicFlow OS
-          </span>
-        </div>
-        
-        {currentRole === 'admin' && (
-          <Button 
-            variant="default" 
-            className="bg-[#4F46E5] hover:bg-indigo-700 text-white text-[10px] h-8 px-3 rounded-lg group-data-[collapsible=icon]:hidden font-bold transition-all shadow-md flex items-center gap-1.5"
-          >
-            <Lock size={12} />
-            Execute Payroll Lock
-          </Button>
-        )}
-      </SidebarHeader>
+      {/* Header Section Fix */}
+<SidebarHeader className="h-auto flex flex-col items-start px-4 py-4 border-b bg-white gap-3">
+  <div className="flex items-center gap-2">
+    <div className="size-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-indigo-100">
+      AF
+    </div>
+    <span className="font-black text-slate-900 group-data-[collapsible=icon]:hidden tracking-tight text-sm">
+      AcademicFlow OS
+    </span>
+  </div>
+  
+  {/* Payroll Lock Button - Now Refined */}
+  {currentRole === 'admin' && (
+    <Button 
+      variant="secondary" 
+      className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[10px] h-8 rounded-lg group-data-[collapsible=icon]:hidden font-black transition-all border border-indigo-100 flex items-center justify-center gap-1.5 uppercase tracking-wider"
+    >
+      <Lock size={12} strokeWidth={3} />
+      Payroll Lock
+    </Button>
+  )}
+</SidebarHeader>
 
       <SidebarContent className="bg-white">
         <SidebarGroup>
