@@ -89,35 +89,37 @@ export function AdminHeader() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-80 rounded-2xl p-2 bg-white text-slate-900 shadow-2xl border border-slate-200/90 z-50">
-              <DropdownMenuLabel className="flex items-center justify-between text-xs font-bold text-slate-900 px-2 py-1.5">
-                <span>Notifications</span>
-                <span className="text-[10px] text-indigo-600 font-semibold cursor-pointer hover:underline" onClick={() => setNotificationsCount(0)}>
-                  Mark all read
-                </span>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="my-1 bg-slate-100" />
-              <div className="space-y-1 py-1">
-                <div className="flex gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
-                  <div className="size-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 size={16} />
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="flex items-center justify-between text-xs font-bold text-slate-900 px-2 py-1.5">
+                  <span>Notifications</span>
+                  <span className="text-[10px] text-indigo-600 font-semibold cursor-pointer hover:underline" onClick={() => setNotificationsCount(0)}>
+                    Mark all read
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                <div className="space-y-1 py-1">
+                  <div className="flex gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
+                    <div className="size-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Fee Payroll Executed</p>
+                      <p className="text-[10px] text-slate-500 leading-tight">Monthly staff disbursements processed successfully.</p>
+                      <span className="text-[9px] text-slate-400 font-medium">10 mins ago</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Fee Payroll Executed</p>
-                    <p className="text-[10px] text-slate-500 leading-tight">Monthly staff disbursements processed successfully.</p>
-                    <span className="text-[9px] text-slate-400 font-medium">10 mins ago</span>
+                  <div className="flex gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
+                    <div className="size-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <Activity size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">New Admission Request</p>
+                      <p className="text-[10px] text-slate-500 leading-tight">5 new student applications require approval.</p>
+                      <span className="text-[9px] text-slate-400 font-medium">1 hour ago</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
-                  <div className="size-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
-                    <Activity size={16} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">New Admission Request</p>
-                    <p className="text-[10px] text-slate-500 leading-tight">5 new student applications require approval.</p>
-                    <span className="text-[9px] text-slate-400 font-medium">1 hour ago</span>
-                  </div>
-                </div>
-              </div>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
 
