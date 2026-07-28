@@ -10,7 +10,6 @@ import {
   History, 
   ListTodo, 
   Wallet,
-  Lock,
   BookOpen,
   PenTool,
   CheckSquare,
@@ -102,28 +101,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props} className="border-r border-slate-200">
-      {/* Header Section Fix */}
-<SidebarHeader className="h-auto flex flex-col items-start px-4 py-4 border-b bg-white gap-3">
-  <div className="flex items-center gap-2">
-    <div className="size-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shrink-0 shadow-lg shadow-indigo-100">
-      AF
-    </div>
-    <span className="font-black text-slate-900 group-data-[collapsible=icon]:hidden tracking-tight text-sm">
-      AcademicFlow OS
-    </span>
-  </div>
-  
-  {/* Payroll Lock Button - Now Refined */}
-  {currentRole === 'admin' && (
-    <Button 
-      variant="secondary" 
-      className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-[10px] h-8 rounded-lg group-data-[collapsible=icon]:hidden font-black transition-all border border-indigo-100 flex items-center justify-center gap-1.5 uppercase tracking-wider"
-    >
-      <Lock size={12} strokeWidth={3} />
-      Payroll Lock
-    </Button>
-  )}
-</SidebarHeader>
+      {/* Header Section */}
+      <SidebarHeader className="h-16 flex items-center px-4 border-b bg-white">
+        <div className="flex items-center gap-2.5">
+          <div className="size-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-black shrink-0 shadow-sm">
+            AF
+          </div>
+          <span className="font-black text-slate-900 group-data-[collapsible=icon]:hidden tracking-tight text-sm">
+            AcademicFlow OS
+          </span>
+        </div>
+      </SidebarHeader>
 
       <SidebarContent className="bg-white">
         <SidebarGroup>
