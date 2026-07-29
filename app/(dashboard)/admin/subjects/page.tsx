@@ -1,38 +1,27 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Book, Users, Plus, Search, MoreVertical, 
-  Layers, GraduationCap, Clock, Filter, 
-  Sparkles, CheckCircle2, BookOpen, Microscope,
-  Globe2, Monitor, ArrowUpRight, Target
+  Plus, Search, MoreHorizontal, Layers, GraduationCap, Clock, Filter, 
+  BookOpen, ArrowUpRight, Target, TrendingUp, LayoutGrid, Database, 
+  FileText, Settings, Download, Globe, Microscope, Monitor, Book
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { 
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid 
+} from "recharts";
+import { cn } from "@/lib/utils";
 
-// --- TYPES & DATA ---
-interface Subject {
-  id: string;
-  name: string;
-  code: string;
-  stream: 'Science' | 'Arts' | 'Tech' | 'Language';
-  teacher: { name: string; avatar: string };
-  load: number;
-  students: number;
-  progress: number;
-  type: 'Core' | 'Elective';
-}
-
-const subjects: Subject[] = [
-  { id: "1", name: "Advanced Mathematics", code: "MTH-401", stream: 'Science', teacher: { name: "Zia Khan", avatar: "1" }, load: 8, students: 142, progress: 65, type: 'Core' },
-  { id: "2", name: "Quantum Physics", code: "PHY-302", stream: 'Science', teacher: { name: "Sarah Ahmed", avatar: "2" }, load: 6, students: 98, progress: 40, type: 'Core' },
-  { id: "3", name: "Modern Computing", code: "CS-505", stream: 'Tech', teacher: { name: "Bilal Raza", avatar: "3" }, load: 7, students: 120, progress: 85, type: 'Elective' },
-  { id: "4", name: "English Literature", code: "ENG-101", stream: 'Language', teacher: { name: "Fatima Ali", avatar: "4" }, load: 5, students: 200, progress: 92, type: 'Core' },
-  { id: "5", name: "Organic Chemistry", code: "CHM-202", stream: 'Science', teacher: { name: "Usman Ghani", avatar: "5" }, load: 6, students: 110, progress: 30, type: 'Core' },
+// --- MOCK DATA ---
+const subjects = [
+  { id: "1", name: "Advanced Mathematics", code: "MTH-401", stream: 'Science', teacher: "Zia Khan", load: 8, students: 142, progress: 65, trend: [{v: 30}, {v: 45}, {v: 40}, {v: 65}] },
+  { id: "2", name: "Quantum Physics", code: "PHY-302", stream: 'Science', teacher: "Sarah Ahmed", load: 6, students: 98, progress: 40, trend: [{v: 10}, {v: 20}, {v: 25}, {v: 40}] },
+  { id: "3", name: "Modern Computing", code: "CS-505", stream: 'Tech', teacher: "Bilal Raza", load: 7, students: 120, progress: 85, trend: [{v: 50}, {v: 60}, {v: 75}, {v: 85}] },
+  { id: "4", name: "English Literature", code: "ENG-101", stream: 'Language', teacher: "Fatima Ali", load: 5, students: 200, progress: 92, trend: [{v: 70}, {v: 80}, {v: 85}, {v: 92}] },
+  { id: "5", name: "Organic Chemistry", code: "CHM-202", stream: 'Science', teacher: "Usman Ghani", load: 6, students: 110, progress: 30, trend: [{v: 10}, {v: 15}, {v: 25}, {v: 30}] },
 ];
 
 export default function EliteSubjectManagement() {
@@ -43,148 +32,169 @@ export default function EliteSubjectManagement() {
   if (!mounted) return null;
 
   return (
-    <div className="p-6 lg:p-10 space-y-10 max-w-[1700px] mx-auto animate-in fade-in duration-700">
+    <div className="flex flex-col h-full bg-[#F8FAFC] overflow-hidden animate-in fade-in duration-500 font-sans">
       
-      {/* 1. CURRICULUM COMMAND HEADER */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 bg-white p-8 rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-           <Book size={120} />
-        </div>
-        
-        <div className="space-y-3 relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <Badge className="bg-indigo-600 text-white border-none font-black text-[9px] tracking-widest px-2.5 py-1">CURRICULUM v2.0</Badge>
-            <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-               <Sparkles size={12} className="text-amber-500 animate-pulse" /> 14 Active Subjects Enrolled
+      {/* 1. COMPACT HEADER (Dashboard Style) */}
+      <header className="shrink-0 h-[64px] border-b border-slate-100 bg-white flex items-center justify-between px-6 z-20">
+        <div className="flex flex-col">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest leading-none">
+                ACADEMIC INTELLIGENCE <span className="text-slate-300">•</span> <span className="text-slate-400">SESSION 2026</span>
             </div>
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter leading-none">Curriculum <span className="text-indigo-600">Architecture</span></h1>
-          <p className="text-xs text-slate-500 font-medium max-w-md uppercase tracking-tight">Define academic nodes, lead faculty assignments, and track syllabus coverage metrics.</p>
+            <h1 className="text-lg font-black text-slate-900 tracking-tight mt-1 uppercase italic">
+                Curriculum <span className="text-indigo-600">Architecture</span>
+            </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 relative z-10">
-           <div className="text-center px-4 border-r border-slate-200">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Weekly Load</p>
-              <p className="text-xl font-black text-slate-900 leading-none">42 <span className="text-[10px] text-indigo-500">Periods</span></p>
-           </div>
-           <div className="text-center px-4 border-r border-slate-200">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Progress</p>
-              <p className="text-xl font-black text-slate-900 leading-none">72% <span className="text-[10px] text-emerald-500">Done</span></p>
-           </div>
-           <Button className="bg-slate-900 hover:bg-indigo-600 shadow-xl h-12 rounded-2xl font-black uppercase text-[10px] gap-2 tracking-widest px-8">
-              <Plus size={16} strokeWidth={3} /> Add Node
+        <div className="flex items-center gap-3">
+           <Button variant="outline" className="h-9 px-4 rounded-xl text-[11px] font-bold uppercase tracking-wider border-slate-200 bg-white flex gap-2">
+              <Download size={14} /> Export
            </Button>
+           <Button className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-indigo-100 transition-all px-5 rounded-xl flex gap-2">
+                <Plus size={14} strokeWidth={3} /> New Module
+            </Button>
         </div>
-      </div>
+      </header>
 
-      {/* 2. SMART FILTERING & SEARCH */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-30">
-        <div className="bg-white/80 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-1">
-           {['All', 'Science', 'Tech', 'Arts', 'Language'].map((stream) => (
-             <button 
-                key={stream}
-                onClick={() => setActiveStream(stream)}
-                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeStream === stream ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
-             >
-                {stream}
-             </button>
-           ))}
+      {/* 2. SCROLLABLE AREA */}
+      <main className="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-6">
+        
+        {/* DASHBOARD-STYLE KPI ROW (Matching your Dashboard Image) */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-[1600px] mx-auto">
+           <DashStat label="Total Modules" value="14" trend="+2 New" color="indigo" icon={<Layers size={14}/>}/>
+           <DashStat label="Avg Progress" value="72.4%" trend="+4.2%" color="emerald" icon={<Target size={14}/>}/>
+           <DashStat label="Weekly Load" value="42 Hrs" trend="+8.6%" color="blue" icon={<Clock size={14}/>}/>
+           <DashStat label="Lead Faculty" value="09" trend="+1.2%" color="purple" icon={<GraduationCap size={14}/>}/>
+           <DashStat label="Active Nodes" value="1,840" trend="+2 Active" color="orange" icon={<Monitor size={14}/>}/>
+           <DashStat label="Success Rate" value="94%" trend="+3.5%" color="rose" icon={<TrendingUp size={14}/>}/>
         </div>
 
-        <div className="relative group w-full md:w-96">
-           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-           <input placeholder="Search Curriculum ID or Name..." className="w-full pl-12 pr-4 h-12 bg-white border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:ring-4 ring-indigo-50 transition-all shadow-sm" />
-        </div>
-      </div>
+        {/* TOOLBAR (Dashboard Style) */}
+        <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row gap-4 items-center justify-between">
+           <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+              {['All', 'Science', 'Tech', 'Arts', 'Language'].map((stream) => (
+                <button 
+                    key={stream}
+                    onClick={() => setActiveStream(stream)}
+                    className={cn(
+                        "px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                        activeStream === stream ? "bg-indigo-600 text-white shadow-md" : "text-slate-400 hover:text-slate-600"
+                    )}
+                >
+                    {stream}
+                </button>
+              ))}
+           </div>
 
-      {/* 3. SUBJECT NODES GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 pb-20">
-        {subjects.map((sub) => (
-          <SubjectCard key={sub.id} subject={sub} />
-        ))}
-      </div>
+           <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="relative flex-1 md:w-80 group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" size={14} />
+                <input placeholder="Search curriculum records..." className="w-full h-10 pl-11 pr-4 bg-white border border-slate-200 rounded-2xl text-[11px] font-bold outline-none focus:ring-4 ring-indigo-50 transition-all shadow-sm" />
+              </div>
+              <Button variant="outline" className="h-10 w-10 p-0 border-slate-200 bg-white rounded-2xl"><Filter size={14}/></Button>
+           </div>
+        </div>
+
+        {/* SUBJECT GRID (Clean Dashboard Cards) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-[1600px] mx-auto pb-12">
+          {subjects.map((sub) => (
+            <SubjectNodeCard key={sub.id} subject={sub} />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
 
-// --- WORLD CLASS CARD COMPONENT ---
-
-function SubjectCard({ subject }: { subject: Subject }) {
-  const getStreamIcon = (stream: string) => {
-    switch(stream) {
-      case 'Science': return <Microscope size={22}/>;
-      case 'Tech': return <Monitor size={22}/>;
-      case 'Language': return <Globe2 size={22}/>;
-      default: return <BookOpen size={22}/>;
+// --- DASHBOARD STYLE STAT COMPONENT ---
+function DashStat({ label, value, trend, color, icon }: any) {
+    const colors: any = {
+        indigo: "bg-indigo-50 text-indigo-600",
+        emerald: "bg-emerald-50 text-emerald-600",
+        blue: "bg-blue-50 text-blue-600",
+        purple: "bg-purple-50 text-purple-600",
+        orange: "bg-orange-50 text-orange-600",
+        rose: "bg-rose-50 text-rose-600",
     }
-  }
+    return (
+        <Card className="p-4 rounded-[20px] bg-white border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-all h-[130px]">
+            <div className="flex justify-between items-start w-full">
+                <div className={cn("p-2.5 rounded-xl shadow-sm", colors[color])}>{icon}</div>
+                <span className={cn("text-[9px] font-black px-1.5 py-0.5 rounded-md", colors[color])}>{trend}</span>
+            </div>
+            <div className="mt-2">
+                <p className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{value}</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2">{label}</p>
+            </div>
+        </Card>
+    )
+}
 
+// --- CLEAN SUBJECT CARD (Matching Dashboard Style) ---
+function SubjectNodeCard({ subject }: { subject: any }) {
   return (
-    <motion.div whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 300 }}>
-       <Card className="border-none shadow-xl shadow-slate-200/40 rounded-[32px] bg-white overflow-hidden group cursor-default">
-          <div className="p-8 space-y-6">
-             {/* Card Top */}
-             <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4">
-                   <div className="size-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-xl group-hover:shadow-indigo-100 transition-all duration-500">
-                      {getStreamIcon(subject.stream)}
-                   </div>
-                   <div>
-                      <h3 className="text-lg font-black text-slate-900 tracking-tight leading-none mb-1.5 group-hover:text-indigo-600 transition-colors">{subject.name}</h3>
-                      <div className="flex items-center gap-2">
-                         <span className="text-[10px] font-black text-indigo-400 tracking-widest uppercase">{subject.code}</span>
-                         <Badge className="bg-slate-50 text-slate-400 border-none text-[8px] font-black uppercase rounded-md px-2 py-0.5">{subject.type}</Badge>
-                      </div>
-                   </div>
+    <Card className="border-slate-200 shadow-sm rounded-[32px] bg-white overflow-hidden group hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 transition-all flex flex-col h-full font-sans">
+       <div className="p-8 space-y-6 flex-1">
+          <div className="flex justify-between items-start">
+             <div className="flex items-center gap-4">
+                <div className="size-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner">
+                   <BookOpen size={20} />
                 </div>
-                <button className="text-slate-200 hover:text-slate-400 transition-colors"><MoreVertical size={20}/></button>
-             </div>
-
-             {/* Progress Matrix */}
-             <div className="space-y-2">
-                <div className="flex justify-between items-end">
-                   <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                      <Target size={12} className="text-indigo-600" /> Syllabus Coverage
-                   </div>
-                   <span className="text-[10px] font-black text-indigo-600 tabular-nums">{subject.progress}%</span>
-                </div>
-                <Progress value={subject.progress} className="h-1.5 bg-slate-50" />
-             </div>
-
-             {/* Meta Grid */}
-             <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 group-hover:bg-white group-hover:shadow-sm transition-all">
-                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Load / Week</p>
-                   <div className="flex items-center gap-2 text-xs font-black text-slate-800">
-                      <Clock size={14} className="text-indigo-400" /> {subject.load} Sessions
-                   </div>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 group-hover:bg-white group-hover:shadow-sm transition-all">
-                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Student Body</p>
-                   <div className="flex items-center gap-2 text-xs font-black text-slate-800">
-                      <Users size={14} className="text-emerald-400" /> {subject.students} Active
+                <div>
+                   <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-tight leading-none group-hover:text-indigo-600 transition-colors">{subject.name}</h3>
+                   <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-[9px] font-bold border-slate-100 bg-white text-indigo-500 py-0 px-2 uppercase">{subject.code}</Badge>
+                      <span className="text-[9px] font-black text-slate-300 uppercase tracking-tighter">{subject.stream} Node</span>
                    </div>
                 </div>
              </div>
+             <button className="text-slate-300 hover:text-slate-600"><MoreHorizontal size={18}/></button>
+          </div>
 
-             {/* Faculty & Footer */}
-             <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                <div className="flex items-center gap-3 group/faculty cursor-pointer">
-                   <Avatar className="size-9 border-2 border-white shadow-md">
-                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${subject.teacher.avatar}`} />
-                      <AvatarFallback className="bg-indigo-50 text-indigo-600 text-[10px] font-bold">T</AvatarFallback>
-                   </Avatar>
-                   <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Lead Faculty</p>
-                      <p className="text-xs font-bold text-slate-800 group-hover/faculty:text-indigo-600 transition-colors leading-none">{subject.teacher.name}</p>
-                   </div>
+          <div className="flex items-center gap-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+             <div className="flex-1 space-y-2">
+                <div className="flex justify-between text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                   <span>Coverage Depth</span>
+                   <span className="text-indigo-600">{subject.progress}%</span>
                 </div>
-                <Button variant="ghost" size="sm" className="h-10 rounded-xl group-hover:bg-indigo-50 text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 tracking-widest">
-                   Launch Ledger <ArrowUpRight size={14} className="ml-1" />
-                </Button>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-600 rounded-full transition-all duration-1000" style={{ width: `${subject.progress}%` }} />
+                </div>
+             </div>
+             <div className="w-16 h-10 shrink-0">
+                <ResponsiveContainer width="100%" height="100%">
+                   <AreaChart data={subject.trend}>
+                      <Area type="monotone" dataKey="v" stroke="#6366f1" fill="#6366f1" fillOpacity={0.1} strokeWidth={2.5} />
+                   </AreaChart>
+                </ResponsiveContainer>
              </div>
           </div>
-       </Card>
-    </motion.div>
+
+          <div className="grid grid-cols-2 gap-4">
+             <div className="text-center p-3 bg-white border border-slate-100 rounded-2xl">
+                <p className="text-[8px] font-black text-slate-300 uppercase mb-1">Load / Week</p>
+                <p className="text-[12px] font-black text-slate-800 tracking-tight">{subject.load} Sessions</p>
+             </div>
+             <div className="text-center p-3 bg-white border border-slate-100 rounded-2xl">
+                <p className="text-[8px] font-black text-slate-300 uppercase mb-1">Students</p>
+                <p className="text-[12px] font-black text-slate-800 tracking-tight">{subject.students} Enrolled</p>
+             </div>
+          </div>
+       </div>
+
+       <div className="p-5 pt-0 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="size-8 rounded-full bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center text-[10px] font-black text-indigo-600">
+                {subject.teacher.substring(0,1)}
+             </div>
+             <div className="leading-none">
+                <p className="text-[8px] font-bold text-slate-400 uppercase">Lead Chief</p>
+                <p className="text-[10px] font-black text-slate-700">{subject.teacher}</p>
+             </div>
+          </div>
+          <Button variant="ghost" className="h-9 px-4 rounded-xl text-[10px] font-black uppercase text-indigo-600 hover:bg-indigo-50 tracking-widest gap-2 group/btn">
+             Audit Node <ArrowUpRight size={14} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
+          </Button>
+       </div>
+    </Card>
   )
 }

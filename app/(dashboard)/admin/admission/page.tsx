@@ -3,221 +3,280 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  UserPlus, User, Phone, Mail, MapPin, 
-  Calendar, BookOpen, ShieldCheck, ChevronRight,
-  Camera, Fingerprint, Users, Building2, 
-  UploadCloud, FileText, CheckCircle2, HeartPulse,
-  GraduationCap, AlertCircle, Save, Info, Sparkles, Hash
+  UserPlus, User, Phone, Mail, MapPin, Calendar, ChevronRight, 
+  UploadCloud, FileText, CheckCircle2, GraduationCap, AlertCircle, Save, Sparkles, Hash,
+  Database, ArrowRight, ShieldCheck, Clock, School, HeartPulse, Loader2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { cn } from "@/lib/utils";
 
-// --- TYPES & INTERFACES ---
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLSelectElement> {
-  label: string;
-  icon?: React.ReactNode;
-  options?: string[];
-  type?: string;
-}
+const STEPS = [
+  { id: 'identity', label: 'Identity Node', sub: 'Legal Data' },
+  { id: 'academic', label: 'Academic Node', sub: 'History' },
+  { id: 'guardian', label: 'Guardian Node', sub: 'Stakeholders' },
+  { id: 'vault', label: 'Security Vault', sub: 'Uploads' },
+];
 
-export default function AdmissionCommandCenter() {
-  const [activeStep, setActiveStep] = useState('profile');
+export default function EliteAdmissionConsole() {
+  const [activeStep, setActiveStep] = useState('identity');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
-  const steps = [
-    { id: 'profile', label: 'Identity Ledger', icon: <Fingerprint size={14}/>, progress: 100 },
-    { id: 'guardian', label: 'Guardian Portfolio', icon: <Users size={14}/>, progress: 60 },
-    { id: 'placement', label: 'Academic Node', icon: <GraduationCap size={14}/>, progress: 0 },
-    { id: 'vault', label: 'Document Vault', icon: <UploadCloud size={14}/>, progress: 0 },
-  ];
+  const activeIndex = STEPS.findIndex(s => s.id === activeStep);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] selection:bg-indigo-100 flex flex-col h-screen overflow-hidden">
+    /* 1. Main Wrapper: Fill parent container, no screen jumping */
+    <div className="flex flex-col h-full w-full bg-[#FDFDFD] overflow-hidden font-sans text-slate-900 border-l border-slate-100">
       
-      {/* 1. ELITE HEADER */}
-      <header className="h-16 shrink-0 flex items-center justify-between px-8 bg-white border-b z-40 shadow-sm backdrop-blur-md bg-white/80">
+      {/* 2. COMPACT HEADER (Fixed) */}
+      <header className="h-[56px] shrink-0 flex items-center justify-between px-6 bg-white border-b border-slate-100 z-50">
         <div className="flex items-center gap-4">
-           <div className="size-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-100">
-              <UserPlus size={18} strokeWidth={2.5} />
+           <div className="size-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+              <UserPlus size={16} />
            </div>
-           <div>
-              <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                 <span>Administration</span> <ChevronRight size={10} className="text-slate-300" /> <span className="text-indigo-600 font-black">Entity Registration</span>
+           <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                 <span>Registry Hub</span> <ChevronRight size={8} /> <span className="text-indigo-600">Onboarding</span>
               </div>
-              <h1 className="text-lg font-black text-slate-900 tracking-tight leading-none">Admission Command Center</h1>
+              <h1 className="text-sm font-bold text-slate-800 tracking-tight leading-tight mt-0.5 uppercase">Admission Command</h1>
            </div>
         </div>
 
         <div className="flex items-center gap-3">
-           <Badge variant="outline" className="h-7 text-[8px] font-black tracking-widest px-2 border-emerald-200 text-emerald-600 bg-emerald-50">DRAFT AUTO-SAVED</Badge>
-           <Button variant="ghost" className="h-8 rounded-lg text-[9px] font-black uppercase text-slate-400 hover:text-rose-500 transition-colors">Discard</Button>
-           <Button className="h-8 px-5 rounded-lg bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest shadow-xl flex items-center gap-2 hover:bg-slate-800 transition-all">
-              <Save size={12} /> Save Progress
+           <div className="hidden md:flex flex-col items-end px-4 border-r border-slate-100">
+              <div className="flex items-center gap-1.5">
+                 <div className="size-1.5 rounded-full bg-emerald-500" />
+                 <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">Active Protocol</span>
+              </div>
+           </div>
+           <Button variant="ghost" className="h-8 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <Save size={12} className="mr-1.5" /> Save Draft
            </Button>
         </div>
       </header>
 
-      {/* 2. MAIN LAYOUT (GRID) */}
-      <main className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
+      {/* 3. CORE CONTENT AREA (Flex container to manage height) */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         
-        {/* LEFT ASIDE: STEP NAVIGATION */}
-        <aside className="lg:col-span-3 border-r bg-white/50 p-6 space-y-8 overflow-y-auto">
-           <div className="space-y-2">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 mb-4">Registration Flow</p>
-              {steps.map((step) => (
-                 <button 
-                    key={step.id}
-                    onClick={() => setActiveStep(step.id)}
-                    className={`w-full group flex flex-col gap-2 p-4 rounded-2xl transition-all duration-300 ${
-                       activeStep === step.id 
-                       ? 'bg-white shadow-xl shadow-slate-200/50 ring-1 ring-slate-100' 
-                       : 'hover:bg-white/40'
-                    }`}
-                 >
-                    <div className="flex items-center gap-3">
-                       <div className={`size-8 rounded-xl flex items-center justify-center transition-all ${activeStep === step.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-100 text-slate-400 group-hover:bg-slate-200'}`}>
-                          {step.icon}
+        {/* LEFT NAV - Fixed */}
+        <aside className="w-[210px] border-r border-slate-100 bg-[#FBFCFE] flex flex-col p-4 shrink-0 overflow-y-auto scrollbar-hide">
+           <nav className="space-y-1 relative mt-2">
+              {STEPS.map((step, idx) => {
+                 const isCompleted = idx < activeIndex;
+                 const isActive = activeStep === step.id;
+                 return (
+                    <button 
+                       key={step.id}
+                       onClick={() => setActiveStep(step.id)}
+                       className={cn(
+                          "w-full flex items-center gap-3 p-2.5 rounded-lg transition-all relative z-10",
+                          isActive ? "bg-white shadow-sm ring-1 ring-slate-200" : "text-slate-400 hover:bg-slate-50"
+                       )}
+                    >
+                       <div className={cn(
+                         "size-6 rounded-md flex items-center justify-center border transition-all text-[10px] font-bold",
+                         isActive ? "bg-slate-800 text-white shadow-sm" : isCompleted ? "bg-indigo-50 border-indigo-100 text-indigo-600" : "bg-white border-slate-200"
+                       )}>
+                          {isCompleted ? <CheckCircle2 size={12} /> : idx + 1}
                        </div>
                        <div className="text-left">
-                          <p className={`text-[11px] font-black uppercase tracking-widest ${activeStep === step.id ? 'text-slate-900' : 'text-slate-400'}`}>{step.label}</p>
-                          <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Readiness: {step.progress}%</p>
+                          <p className={cn("text-[10px] font-bold uppercase tracking-tight", isActive ? "text-slate-900" : "text-slate-500")}>{step.label}</p>
+                          <span className="text-[8px] font-medium text-slate-400 block uppercase tracking-tighter">{step.sub}</span>
                        </div>
-                    </div>
-                    {step.progress > 0 && <Progress value={step.progress} className="h-1 bg-slate-100" />}
-                 </button>
-              ))}
-           </div>
-
-           {/* Biometric Snapshot Widget */}
-           <div className="bg-slate-900 rounded-[28px] p-6 text-white text-center relative overflow-hidden group">
-              <div className="absolute top-0 right-0 size-20 bg-indigo-500/10 blur-2xl rounded-full" />
-              <div className="relative z-10">
-                 <div className="size-20 rounded-full bg-white/5 border-2 border-white/10 mx-auto flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-500">
-                    <User size={32} className="text-slate-500" />
-                 </div>
-                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Entity Identity</h4>
-                 <Button size="sm" className="h-7 text-[8px] font-black bg-white text-slate-900 hover:bg-slate-100 rounded-lg px-4 gap-2">
-                    <Camera size={10}/> UPLOAD PHOTO
-                 </Button>
-              </div>
-           </div>
+                    </button>
+                 );
+              })}
+              <div className="absolute left-[23px] top-4 bottom-4 w-px bg-slate-100 -z-0" />
+           </nav>
         </aside>
 
-        {/* RIGHT CONTENT: SCROLLABLE FORM */}
-        <div className="lg:col-span-9 bg-slate-50/30 overflow-y-auto custom-scrollbar p-8 lg:p-12 pb-32">
-           <AnimatePresence mode="wait">
-              <motion.div 
-                 key={activeStep}
-                 initial={{ opacity: 0, x: 20 }} 
-                 animate={{ opacity: 1, x: 0 }} 
-                 className="max-w-4xl mx-auto space-y-8"
-              >
-                 {/* PERSONAL LEDGER */}
-                 <Card className="border-none shadow-2xl shadow-slate-200/40 rounded-[32px] bg-white overflow-hidden">
-                    <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center gap-6">
-                       <div className="size-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                          <Sparkles size={20} />
-                       </div>
+        {/* CENTER PANEL - The Only Scrollable Area */}
+        <main className="flex-1 flex flex-col bg-white overflow-hidden relative">
+           
+           {/* Scrollable Container */}
+           <div className="flex-1 overflow-y-auto p-6 lg:p-8 scrollbar-hide">
+              <div className="max-w-4xl mx-auto"> {/* Expanded to 4xl */}
+                 
+                 {/* Compact Title Section */}
+                 <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                       <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><Sparkles size={16} /></div>
                        <div>
-                          <CardTitle className="text-[13px] font-black uppercase tracking-widest text-slate-900">Personal Identity Ledger</CardTitle>
-                          <CardDescription className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Primary legal documentation required</CardDescription>
+                          <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight leading-none">{activeStep} Module</h2>
+                          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">Registry Node Interface</p>
                        </div>
-                    </CardHeader>
-                    <CardContent className="p-8 grid grid-cols-1 md:grid-cols-3 gap-5">
-                       <div className="md:col-span-2">
-                          <CustomInput label="Legal Full Name" placeholder="As per B-Form" icon={<User size={14}/>} />
-                       </div>
-                       <CustomInput label="Date of Birth" type="date" icon={<Calendar size={14}/>} />
-                       <CustomInput label="Gender Node" type="select" options={["Male", "Female", "Non-Binary"]} />
-                       <CustomInput label="Blood Group" type="select" options={["A+", "B+", "AB+", "O+", "A-", "B-", "AB-", "O-"]} />
-                       <CustomInput label="Nationality" placeholder="e.g. Pakistani" icon={<Building2 size={14}/>} />
-                       <div className="md:col-span-3">
-                          <CustomInput label="Residential Landmark" placeholder="Primary street address, block, and city node" icon={<MapPin size={14}/>} />
-                       </div>
-                    </CardContent>
-                 </Card>
+                    </div>
+                    <Badge variant="outline" className="text-[8px] font-bold text-slate-400 border-slate-100 px-2 py-0">v2.0.4</Badge>
+                 </div>
 
-                 {/* GUARDIAN LEDGER */}
-                 <Card className="border-none shadow-2xl shadow-slate-200/40 rounded-[32px] bg-white overflow-hidden">
-                    <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center gap-6">
-                       <div className="size-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
-                          <Users size={20} />
-                       </div>
-                       <div>
-                          <CardTitle className="text-[13px] font-black uppercase tracking-widest text-slate-900">Guardian Hierarchy</CardTitle>
-                          <CardDescription className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Stakeholder contact nodes</CardDescription>
-                       </div>
-                    </CardHeader>
-                    <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-                       <CustomInput label="Primary Stakeholder Name" placeholder="Father or Guardian" icon={<User size={14}/>} />
-                       <CustomInput label="Mobile Link" placeholder="+92 3XX XXXXXXX" icon={<Phone size={14}/>} />
-                       <CustomInput label="Verified Email" type="email" placeholder="guardian@node.com" icon={<Mail size={14}/>} />
-                       <CustomInput label="National Identity (CNIC)" placeholder="XXXXX-XXXXXXX-X" icon={<Hash size={14}/>} />
-                    </CardContent>
-                 </Card>
-              </motion.div>
-           </AnimatePresence>
-        </div>
-      </main>
+                 {/* FORM CONTENT */}
+                 <div className="pb-10">
+                    <AnimatePresence mode="wait">
+                       <motion.div 
+                          key={activeStep}
+                          initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                          className="grid grid-cols-1 md:grid-cols-2 gap-5"
+                       >
+                          {activeStep === 'identity' && (
+                           <>
+                               <EliteInput label="Student Full Name" placeholder="Full legal name" icon={<User size={12}/>} />
+                               <EliteInput label="Birth Registry" type="date" icon={<Calendar size={12}/>} />
+                               <EliteInput label="Gender Node" type="select" options={["Male", "Female", "Other"]} icon={<User size={12}/>} />
+                               <EliteInput label="Blood Group" type="select" options={["A+", "B+", "O-", "AB+"]} icon={<HeartPulse size={12}/>} />
+                               <div className="md:col-span-2"><EliteInput label="Permanent Residence" placeholder="Complete address node" icon={<MapPin size={12}/>} /></div>
+                           </>
+                          )}
 
-      {/* 3. EXECUTIVE FOOTER BAR */}
-      <footer className="h-20 shrink-0 bg-slate-900 text-white px-8 flex items-center justify-between z-50 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.3)]">
-         <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3 text-slate-400 border-r border-white/10 pr-6 mr-2">
-               <AlertCircle size={18} className="text-amber-500" />
-               <div className="text-left">
-                  <p className="text-[10px] font-black uppercase tracking-widest">Protocol Audit</p>
-                  <p className="text-[8px] font-medium opacity-60">Validate via ID Cloud</p>
-               </div>
-            </div>
-            <div className="flex items-center gap-3">
-               <div className="size-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />
-               <span className="text-[10px] font-black uppercase tracking-widest opacity-80 underline underline-offset-4 decoration-white/20">Checklist: 12/14 Complete</span>
-            </div>
-         </div>
-         <Button className="h-12 px-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/20 active:scale-95 transition-all border-none gap-3 group">
-            Finalize Admissions <ShieldCheck className="size-4 group-hover:scale-110 transition-transform" />
-         </Button>
-      </footer>
+                          {activeStep === 'vault' && (
+                           <div className="md:col-span-2 space-y-4">
+                               <div className="p-10 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center group hover:border-indigo-400 transition-all cursor-pointer">
+                                   <div className="size-10 rounded-full bg-white shadow-sm flex items-center justify-center mb-3">
+                                       <UploadCloud size={18} className="text-indigo-500" />
+                                   </div>
+                                   <p className="text-[10px] font-bold uppercase text-slate-700 tracking-wider">Drop Dossier Stream</p>
+                                   <p className="text-[9px] font-medium text-slate-400 mt-1 uppercase">PDF or Image Format (Max 10MB)</p>
+                               </div>
+                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                   <FileStatus label="Identity_Doc.pdf" status="ready" progress={100} />
+                                   <FileStatus label="Academic_Trans.pdf" status="loading" progress={45} />
+                               </div>
+                           </div>
+                          )}
+
+                          {activeStep === 'academic' && (
+                           <>
+                               <EliteInput label="Target Grade" type="select" options={["Grade 8", "O-Levels Year 1"]} icon={<GraduationCap size={12}/>} />
+                               <EliteInput label="Prev School" placeholder="School Name" icon={<School size={12}/>} />
+                               <EliteInput label="Result Score" placeholder="GPA / %" icon={<FileText size={12}/>} />
+                               <EliteInput label="Conduct Audit" type="select" options={["Exemplary", "Average"]} icon={<ShieldCheck size={12}/>} />
+                           </>
+                          )}
+
+                          {activeStep === 'guardian' && (
+                           <>
+                               <EliteInput label="Guardian Name" placeholder="Father/Mother" icon={<User size={12}/>} />
+                               <EliteInput label="Contact Node" placeholder="+92 XXX XXXXXXX" icon={<Phone size={12}/>} />
+                               <EliteInput label="Verify Email" type="email" placeholder="email@node.com" icon={<Mail size={12}/>} />
+                               <EliteInput label="National ID" placeholder="CNIC Node" icon={<Hash size={12}/>} />
+                           </>
+                          )}
+                       </motion.div>
+                    </AnimatePresence>
+                 </div>
+              </div>
+           </div>
+
+           {/* 4. STICKY FOOTER (Fixed at the bottom of the main area) */}
+           <footer className="h-[64px] shrink-0 border-t border-slate-100 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 z-40">
+              <div className="flex items-center gap-6">
+                 <div className="flex flex-col">
+                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Progress</span>
+                    <div className="flex items-center gap-3">
+                       <span className="text-xs font-bold text-slate-900 tabular-nums">{(activeIndex + 1) * 25}%</span>
+                       <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-indigo-600 transition-all duration-500" style={{ width: `${(activeIndex + 1) * 25}%` }} />
+                       </div>
+                    </div>
+                 </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button 
+                    variant="ghost" 
+                    className="h-9 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400"
+                    disabled={activeIndex === 0}
+                    onClick={() => setActiveStep(STEPS[activeIndex-1].id)}
+                >
+                    Back
+                </Button>
+                <Button 
+                    onClick={() => activeIndex < 3 && setActiveStep(STEPS[activeIndex+1].id)}
+                    className="h-9 px-6 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-2 active:scale-95"
+                >
+                    {activeIndex === 3 ? "Review Node" : "Continue"} <ArrowRight size={14} />
+                </Button>
+              </div>
+           </footer>
+        </main>
+
+        {/* RIGHT PANEL - Fixed */}
+        <aside className="w-[260px] bg-[#FBFCFE] border-l border-slate-100 flex flex-col p-5 shrink-0 overflow-y-auto scrollbar-hide">
+           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-5">System Intel</p>
+           
+           <Card className="bg-slate-900 text-white rounded-xl p-4 mb-5 border-none shadow-md">
+              <h4 className="text-[8px] font-bold uppercase text-slate-500 mb-4 flex items-center gap-2"><Database size={10} /> Sector Load</h4>
+              <div className="size-28 mx-auto relative">
+                 <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                       <Pie data={[{v: 74, c: '#6366f1'}, {v: 26, c: '#1e293b'}]} innerRadius={30} outerRadius={40} dataKey="v" stroke="none">
+                          <Cell fill="#6366f1" /><Cell fill="#1e293b" />
+                       </Pie>
+                    </PieChart>
+                 </ResponsiveContainer>
+                 <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
+                    <span className="text-xl font-bold tabular-nums">74%</span>
+                    <span className="text-[6px] font-bold text-slate-500 uppercase mt-0.5">Live</span>
+                 </div>
+              </div>
+           </Card>
+
+           <div className="space-y-2">
+              <IntelLog icon={<ShieldCheck size={12} className="text-emerald-500" />} label="Security" sub="AES-256 Active" />
+              <IntelLog icon={<Loader2 size={12} className="text-indigo-500 animate-spin" />} label="Sync Engine" sub="Real-time Node" />
+           </div>
+        </aside>
+      </div>
     </div>
   );
 }
 
-// --- WORLD CLASS INPUT COMPONENT ---
-
-function CustomInput({ label, icon, options, type = "text", ...props }: InputProps) {
-  return (
-    <div className="space-y-2 group">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
-      <div className="relative">
-        {icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-all pointer-events-none">
-            {icon}
-          </div>
-        )}
-        
-        {type === "select" ? (
-          <div className="relative">
-             <select className="w-full h-12 pl-4 pr-10 bg-slate-50/50 border border-slate-200/60 rounded-xl text-xs font-black text-slate-800 focus:ring-4 ring-indigo-50/50 focus:border-indigo-300 outline-none transition-all appearance-none cursor-pointer">
-               {options?.map((opt) => <option key={opt}>{opt}</option>)}
-             </select>
-             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
-                <ChevronRight size={14} className="rotate-90" />
-             </div>
-          </div>
-        ) : (
-          <input 
-            type={type}
-            className={`w-full h-12 ${icon ? 'pl-11' : 'pl-4'} pr-4 bg-slate-50/50 border border-slate-200/60 rounded-xl text-xs font-black text-slate-800 focus:ring-4 ring-indigo-50/50 focus:border-indigo-300 outline-none transition-all placeholder:text-slate-300 placeholder:font-medium`}
-            {...props}
-          />
-        )}
+// COMPACT HELPER COMPONENTS
+function EliteInput({ label, icon, options, type = "text", ...props }: any) {
+   return (
+      <div className="space-y-1.5 group">
+         <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-0.5">{label}</label>
+         <div className="relative">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors">{icon}</div>
+            {type === "select" ? (
+               <select className="w-full h-9 pl-9 pr-3 bg-white border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-700 focus:ring-2 ring-indigo-50/50 transition-all outline-none appearance-none">
+                  {options.map((o: any) => <option key={o}>{o}</option>)}
+               </select>
+            ) : (
+               <input type={type} className="w-full h-9 pl-9 pr-3 bg-white border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-700 focus:ring-2 ring-indigo-50/50 transition-all outline-none placeholder:text-slate-200" {...props} />
+            )}
+         </div>
       </div>
-    </div>
-  )
+   )
+}
+
+function FileStatus({ label, status, progress }: any) {
+    return (
+        <div className="p-3 rounded-lg border border-slate-100 bg-white flex items-center gap-3">
+            <FileText size={14} className={status === 'ready' ? "text-indigo-500" : "text-slate-300"} />
+            <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-bold text-slate-700 truncate uppercase">{label}</p>
+                <div className="h-1 w-full bg-slate-50 mt-1.5 rounded-full overflow-hidden">
+                    <div className={cn("h-full transition-all", status === 'ready' ? "bg-emerald-500" : "bg-indigo-400")} style={{ width: `${progress}%` }} />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function IntelLog({ icon, label, sub }: any) {
+   return (
+      <div className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-50 bg-white hover:border-slate-100 transition-all shadow-sm">
+         <div className="size-7 rounded-md bg-slate-50 flex items-center justify-center shrink-0">{icon}</div>
+         <div className="min-w-0">
+            <h5 className="text-[9px] font-bold text-slate-800 uppercase leading-none truncate">{label}</h5>
+            <p className="text-[7px] font-medium text-slate-400 mt-1 uppercase truncate tracking-tighter">{sub}</p>
+         </div>
+      </div>
+   )
 }

@@ -1,186 +1,160 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  ShieldCheck, Lock, Eye, Edit3, Trash2, 
-  CheckCircle2, ShieldAlert, Zap, Globe, 
-  ChevronRight, Fingerprint, Users, Settings2,
-  Key, Search, Save, Info, AlertTriangle,
-  History, Activity, Shield, LockKeyhole
+  ShieldCheck, Lock, Fingerprint, Users, Settings2,
+  Key, Search, Save, AlertTriangle, Shield, 
+  LockKeyhole, LayoutGrid, Zap, Activity, Download, 
+  Plus, Filter, ShieldAlert, Timer, ChevronRight, CheckCircle2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // --- TYPES ---
-interface Role {
-  id: string;
-  name: string;
-  access: string;
-  users: number;
-  level: 'Full' | 'Restricted' | 'Custom';
-  color: string;
-}
+interface Role { id: string; name: string; access: string; users: number; color: string; }
 
 const roles: Role[] = [
-  { id: '1', name: "Principal", access: "Root Access", users: 1, level: 'Full', color: "bg-indigo-600" },
-  { id: '2', name: "Vice Principal", access: "Manager Node", users: 2, level: 'Restricted', color: "bg-violet-600" },
-  { id: '3', name: "Admin Staff", access: "Operations", users: 5, level: 'Custom', color: "bg-blue-600" },
-  { id: '4', name: "Teaching Node", access: "Academic Only", users: 42, level: 'Restricted', color: "bg-emerald-600" },
+  { id: '1', name: "Principal", access: "Root Access", users: 1, color: "indigo" },
+  { id: '2', name: "Vice Principal", access: "Manager Node", users: 2, color: "emerald" },
+  { id: '3', name: "Admin Staff", access: "Operations", users: 5, color: "blue" },
+  { id: '4', name: "Teacher Node", access: "Academic", users: 42, color: "purple" },
 ];
 
 const modules = [
-  { group: "Core Intelligence", items: ["Dashboard Analytics", "Real-time Pulse", "System Logs"] },
-  { group: "Administrative Node", items: ["Admission Ledger", "Fee Management", "Staff Directory", "Payroll Engine"] },
-  { group: "Academic Workspace", items: ["Exams & Grading", "Master Timetable", "Curriculum Vault"] },
+  { group: "CORE INTELLIGENCE", items: ["Dashboard Analytics", "Real-time Pulse", "System Logs"] },
+  { group: "ADMINISTRATIVE NODE", items: ["Admission Ledger", "Fee Management", "Payroll Engine"] },
+  { group: "ACADEMIC WORKSPACE", items: ["Exams & Grading", "Master Timetable"] },
 ];
-
-// --- CUSTOM PREMIUM TOGGLE ---
-function PremiumToggle({ enabled, onChange }: { enabled: boolean; onChange: () => void }) {
-  return (
-    <button 
-      onClick={onChange}
-      className={`relative w-10 h-5 rounded-full transition-all duration-300 focus:outline-none ring-offset-2 focus:ring-2 ring-indigo-100 ${enabled ? 'bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.4)]' : 'bg-slate-200'}`}
-    >
-      <motion.div 
-        animate={{ x: enabled ? 20 : 2 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        className="absolute top-1 left-0 size-3 bg-white rounded-full shadow-sm"
-      />
-    </button>
-  );
-}
 
 export default function SecurityGovernancePage() {
   const [activeRole, setActiveRole] = useState(roles[0]);
   const [mounted, setMounted] = useState(false);
-  const [permissions, setPermissions] = useState<Record<string, { view: boolean; write: boolean }>>({});
 
-  useEffect(() => { 
-    setMounted(true);
-    const initial: any = {};
-    modules.forEach(g => g.items.forEach(i => initial[i] = { view: true, write: i !== 'System Logs' }));
-    setPermissions(initial);
-  }, []);
-
+  useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
   return (
-    <div className="p-4 lg:p-8 space-y-8 animate-in fade-in duration-700 max-w-[1700px] mx-auto overflow-hidden">
+    <div className="flex flex-col h-full bg-[#FDFDFD] overflow-hidden animate-in fade-in duration-500 font-sans text-slate-900">
       
-      {/* 1. ELITE SECURITY HEADER */}
-      <header className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-8 bg-white p-8 rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-           <LockKeyhole size={120} />
-        </div>
-        
-        <div className="space-y-3 relative z-10">
-          <div className="flex items-center gap-3">
-            <Badge className="bg-slate-900 text-white border-none font-black text-[9px] tracking-widest px-2.5 py-1">GOVERNANCE v1.0</Badge>
-            <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-               <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" /> Global Policy Enforcement Active
+      {/* 1. TOP HEADER (Dashboard Theme Matched) */}
+      <header className="shrink-0 h-[64px] border-b border-slate-100 bg-white flex items-center justify-between px-6 z-20 gap-4">
+        <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest leading-none">
+                SECURITY PROTOCOL <span className="text-slate-300">•</span> <span className="text-slate-400">SESSION 2026</span>
             </div>
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter leading-none italic">Access <span className="text-indigo-600">Governance</span></h1>
-          <p className="text-xs text-slate-500 font-medium max-w-md uppercase tracking-tight">Define granular permissions and security protocols across node hierarchies.</p>
+            <h1 className="text-lg font-black text-slate-900 tracking-tight mt-1 uppercase italic leading-none truncate">
+                Access <span className="text-indigo-600 font-bold not-italic">Governance</span>
+            </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 bg-slate-900 p-6 rounded-3xl relative z-10 shadow-2xl">
-           <div className="text-center px-4 border-r border-white/10">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Security Score</p>
-              <p className="text-xl font-black text-white leading-none tracking-tighter">98 <span className="text-[10px] text-emerald-400 font-bold">OPTIMAL</span></p>
-           </div>
-           <div className="text-center px-4 border-r border-white/10">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Policy Nodes</p>
-              <p className="text-xl font-black text-white leading-none tracking-tighter">14 <span className="text-[10px] text-indigo-400 font-bold">SECURED</span></p>
-           </div>
-           <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-xl h-12 rounded-2xl font-black uppercase text-[10px] gap-2 tracking-widest px-8 border-none transition-all active:scale-95">
-              <ShieldCheck size={18} strokeWidth={3} /> Launch Security Audit
+        <div className="flex items-center gap-2 shrink-0">
+           <Button variant="outline" className="hidden md:flex h-9 px-4 rounded-xl text-[11px] font-bold uppercase border-slate-200 bg-white gap-2">
+              <Download size={14} /> Audit Logs
            </Button>
+           <Button className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold uppercase shadow-lg shadow-indigo-100 transition-all px-5 rounded-xl flex gap-2">
+                <ShieldCheck size={14} strokeWidth={3} /> Deploy Policy
+            </Button>
         </div>
       </header>
 
-      {/* 2. MAIN WORKSPACE */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* 2. SCROLLABLE AREA */}
+      <main className="flex-1 overflow-y-auto p-4 lg:p-6 scrollbar-hide space-y-6 bg-slate-50/20">
         
-        {/* LEFT SIDEBAR */}
-        <aside className="lg:col-span-4 space-y-4">
-           <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest px-2">Role Entities</h2>
-           <div className="space-y-3">
-              {roles.map((role) => (
-                <motion.div 
-                   key={role.id}
-                   whileHover={{ x: 4 }}
-                   onClick={() => setActiveRole(role)}
-                   className={`p-5 rounded-[28px] border transition-all cursor-pointer group ${
-                      activeRole.id === role.id 
-                      ? 'bg-white border-indigo-200 shadow-xl shadow-indigo-100/30 ring-1 ring-indigo-50' 
-                      : 'bg-white/50 border-transparent hover:border-slate-200'
-                   }`}
-                >
-                   <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-4">
-                         <div className={`size-10 rounded-2xl flex items-center justify-center transition-all ${activeRole.id === role.id ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}>
-                            <Fingerprint size={20} />
-                         </div>
-                         <div>
-                            <p className={`text-sm font-black transition-colors ${activeRole.id === role.id ? 'text-slate-900' : 'text-slate-500'}`}>{role.name}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">{role.access}</p>
-                         </div>
-                      </div>
-                      <ChevronRight size={18} className={`transition-all ${activeRole.id === role.id ? 'text-indigo-600 opacity-100' : 'opacity-0'}`} />
-                   </div>
-                </motion.div>
-              ))}
-           </div>
-        </aside>
+        {/* 6-CARD KPI ROW (Dashboard Theme Matched) */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 max-w-[1700px] mx-auto">
+           <DashStat label="Security Score" value="98%" trend="OPTIMAL" color="indigo" icon={<ShieldCheck size={12}/>}/>
+           <DashStat label="Active Admins" value="08" trend="+1 New" color="emerald" icon={<Users size={12}/>}/>
+           <DashStat label="Auth Events" value="1,240" trend="LIVE" color="blue" icon={<Fingerprint size={12}/>}/>
+           <DashStat label="Failed Logins" value="02" trend="SECURE" color="rose" icon={<ShieldAlert size={12}/>}/>
+           <DashStat label="Policy Nodes" value="14" trend="ACTIVE" color="orange" icon={<LayoutGrid size={12}/>}/>
+           <DashStat label="Sync Status" value="Online" trend="v1.0" color="purple" icon={<Activity size={12}/>}/>
+        </div>
 
-        {/* RIGHT: PERMISSION MATRIX */}
-        <div className="lg:col-span-8">
-           <Card className="border-none shadow-2xl shadow-slate-200/50 rounded-[44px] bg-white overflow-hidden">
-              <CardHeader className="p-10 border-b border-slate-50 bg-slate-50/20 flex flex-row items-center justify-between">
-                 <div className="flex items-center gap-6">
-                    <div className="size-16 rounded-3xl bg-white shadow-xl flex items-center justify-center text-indigo-600 border border-slate-50">
-                       <Settings2 size={32} />
+        {/* WORKSPACE GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1700px] mx-auto">
+           
+           {/* ROLES SIDEBAR (Left) */}
+           <div className="lg:col-span-4 space-y-4">
+              <div className="flex items-center justify-between px-2">
+                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrative Roles</h3>
+                 <button className="text-[9px] font-bold text-indigo-600 uppercase">+ New Role</button>
+              </div>
+              <div className="space-y-2">
+                 {roles.map((role) => (
+                    <div 
+                       key={role.id}
+                       onClick={() => setActiveRole(role)}
+                       className={cn(
+                          "p-4 rounded-2xl cursor-pointer transition-all border group",
+                          activeRole.id === role.id 
+                            ? "bg-white border-indigo-200 shadow-xl shadow-indigo-100/50 ring-1 ring-indigo-50" 
+                            : "bg-white/50 border-slate-100 hover:border-slate-200 hover:bg-white"
+                       )}
+                    >
+                       <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-3">
+                             <div className={cn(
+                                "size-9 rounded-xl flex items-center justify-center transition-all",
+                                activeRole.id === role.id ? "bg-indigo-600 text-white shadow-lg" : "bg-slate-100 text-slate-400"
+                             )}>
+                                <Fingerprint size={18} />
+                             </div>
+                             <div>
+                                <p className={cn("text-[11px] font-black uppercase tracking-tight", activeRole.id === role.id ? "text-slate-900" : "text-slate-500")}>{role.name}</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-tighter">{role.access}</p>
+                             </div>
+                          </div>
+                          <ChevronRight size={14} className={cn("transition-all", activeRole.id === role.id ? "text-indigo-600" : "text-slate-200 opacity-0 group-hover:opacity-100")} />
+                       </div>
                     </div>
-                    <div>
-                       <CardTitle className="text-lg font-black uppercase tracking-widest text-slate-900">Permission Matrix</CardTitle>
-                       <CardDescription className="text-[10px] font-black uppercase text-slate-400 mt-1">
-                          Protocol: <span className="text-indigo-600 font-bold">{activeRole.name.toUpperCase()}</span>
-                       </CardDescription>
+                 ))}
+              </div>
+           </div>
+
+           {/* PERMISSION MATRIX (Right) */}
+           <div className="lg:col-span-8">
+              <Card className="border-none bg-white rounded-[32px] shadow-sm ring-1 ring-slate-200/60 overflow-hidden mb-12">
+                 <div className="p-6 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                       <div className="size-10 rounded-xl bg-white shadow-sm border border-slate-200 flex items-center justify-center text-indigo-600"><Settings2 size={20}/></div>
+                       <div>
+                          <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">Node Matrix: <span className="text-indigo-600 italic">{activeRole.name}</span></h3>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase mt-0.5">Define granular access for this operational entity</p>
+                       </div>
+                    </div>
+                    <div className="relative hidden md:block">
+                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={12} />
+                       <input placeholder="Filter modules..." className="w-48 pl-9 h-8 bg-white border border-slate-200 rounded-lg text-[10px] font-bold outline-none focus:ring-2 ring-indigo-50 transition-all" />
                     </div>
                  </div>
-                 <div className="relative hidden md:block">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                    <input placeholder="Filter modules..." className="w-56 pl-11 pr-4 h-11 bg-white border border-slate-100 rounded-xl text-[10px] font-black outline-none focus:ring-4 ring-indigo-50 transition-all" />
-                 </div>
-              </CardHeader>
-              
-              <CardContent className="p-0">
-                 <div className="divide-y divide-slate-100">
+
+                 <div className="p-6 space-y-8">
                     {modules.map((group) => (
-                       <div key={group.group} className="p-8">
-                          <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-                             <Zap size={12} className="fill-indigo-400" /> {group.group}
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div key={group.group} className="space-y-4">
+                          <div className="flex items-center gap-2">
+                             <div className="size-1.5 rounded-full bg-indigo-500" />
+                             <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{group.group}</h4>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                              {group.items.map((item) => (
-                                <div key={item} className="flex items-center justify-between p-5 bg-slate-50/50 rounded-2xl hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all border border-transparent hover:border-indigo-100">
-                                   <div className="flex items-center gap-4">
-                                      <div className="size-8 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors">
-                                         <Lock size={14} />
+                                <div key={item} className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:bg-white hover:border-indigo-100 hover:shadow-sm transition-all group/item">
+                                   <div className="flex items-center gap-3">
+                                      <div className="size-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-300 group-hover/item:text-indigo-600 transition-colors">
+                                         <Lock size={12} />
                                       </div>
-                                      <span className="text-sm font-bold text-slate-700">{item}</span>
+                                      <span className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">{item}</span>
                                    </div>
-                                   <div className="flex items-center gap-6">
-                                      <div className="flex flex-col items-center gap-1.5">
-                                         <span className="text-[8px] font-black text-slate-300 uppercase">View</span>
-                                         <PremiumToggle enabled={permissions[item]?.view ?? false} onChange={() => {}} />
+                                   <div className="flex items-center gap-4 border-l pl-4">
+                                      <div className="flex flex-col items-center gap-1">
+                                         <span className="text-[7px] font-black text-slate-300 uppercase">View</span>
+                                         <DashToggle />
                                       </div>
-                                      <div className="flex flex-col items-center gap-1.5 border-l border-slate-100 pl-6">
-                                         <span className="text-[8px] font-black text-slate-300 uppercase">Write</span>
-                                         <PremiumToggle enabled={permissions[item]?.write ?? false} onChange={() => {}} />
+                                      <div className="flex flex-col items-center gap-1">
+                                         <span className="text-[7px] font-black text-slate-300 uppercase">Write</span>
+                                         <DashToggle enabled />
                                       </div>
                                    </div>
                                 </div>
@@ -189,20 +163,63 @@ export default function SecurityGovernancePage() {
                        </div>
                     ))}
                  </div>
-                 
-                 <div className="p-10 bg-slate-900 flex items-center justify-between border-t border-white/5">
-                    <div className="flex items-center gap-4 text-slate-400">
-                       <Shield size={20} className="text-indigo-400" />
-                       <p className="text-[10px] font-black text-white uppercase tracking-widest">AFFECTS {activeRole.users} USERS</p>
+
+                 <div className="p-5 bg-slate-900 flex items-center justify-between border-t border-white/5">
+                    <div className="flex items-center gap-3">
+                       <ShieldCheck size={18} className="text-emerald-400" />
+                       <p className="text-[9px] font-black text-white uppercase tracking-[0.1em]">Protocol affects {activeRole.users} node users</p>
                     </div>
-                    <Button className="h-14 px-12 rounded-[22px] bg-white text-slate-900 font-black text-[11px] uppercase tracking-widest shadow-2xl hover:bg-slate-50 active:scale-95 transition-all gap-3 border-none">
-                       <Save size={18} /> Deploy Governance Node
+                    <Button className="h-10 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-widest shadow-xl transition-all border-none active:scale-95">
+                       Deploy Matrix Node
                     </Button>
                  </div>
-              </CardContent>
-           </Card>
+              </Card>
+           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
+}
+
+// --- KPI COMPONENT (Dashboard Theme) ---
+function DashStat({ label, value, trend, color, icon }: any) {
+    const colors: any = {
+        indigo: "bg-indigo-50 text-indigo-600",
+        emerald: "bg-emerald-50 text-emerald-600",
+        blue: "bg-blue-50 text-blue-600",
+        purple: "bg-purple-50 text-purple-600",
+        orange: "bg-orange-50 text-orange-600",
+        rose: "bg-rose-50 text-rose-600",
+    }
+    return (
+        <Card className="p-3.5 rounded-xl bg-white border-none shadow-sm ring-1 ring-slate-100 flex flex-col justify-between hover:shadow-md transition-all h-[95px]">
+            <div className="flex justify-between items-start w-full">
+                <div className={cn("p-1.5 rounded-lg shadow-xs", colors[color])}>{icon}</div>
+                <span className={cn("text-[6px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter", colors[color])}>{trend}</span>
+            </div>
+            <div className="mt-1">
+                <p className="text-base font-black text-slate-900 tracking-tight leading-none">{value}</p>
+                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">{label}</p>
+            </div>
+        </Card>
+    )
+}
+
+// --- SLEEK OS TOGGLE ---
+function DashToggle({ enabled = false }: { enabled?: boolean }) {
+    const [isOn, setIsOn] = useState(enabled);
+    return (
+        <button 
+            onClick={() => setIsOn(!isOn)}
+            className={cn(
+                "relative w-7 h-4 rounded-full transition-all duration-300",
+                isOn ? "bg-indigo-600" : "bg-slate-200"
+            )}
+        >
+            <div className={cn(
+                "absolute top-0.5 size-3 bg-white rounded-full transition-all shadow-sm",
+                isOn ? "left-3.5" : "left-0.5"
+            )} />
+        </button>
+    )
 }

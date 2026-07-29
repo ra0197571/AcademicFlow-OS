@@ -3,205 +3,206 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Calendar as CalendarIcon, Clock, Plus, 
-  MoreHorizontal, Download, Sparkles,
-  MapPin, Settings2, History, AlertCircle, BookOpen, User
+  Clock, Plus, MoreHorizontal, Download, LayoutGrid, Timer, 
+  Users, Zap, Filter, Search, GraduationCap, AlertCircle, ArrowUpRight
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 // --- TYPES ---
-interface SlotData {
-  subject: string;
-  teacher: string;
-  room: string;
-  type: 'lecture' | 'lab' | 'break' | 'test';
-}
+interface SlotData { subject: string; teacher: string; room: string; type: string; code: string; }
+interface RegularRow { time: string; isBreak?: false; days: { [key: string]: SlotData }; }
+interface BreakRow { time: string; isBreak: true; label: string; }
+type ScheduleRow = RegularRow | BreakRow;
 
-interface TimeSlot {
-  time: string;
-  days: {
-    [key: string]: SlotData;
-  }
-}
-
-const SCHEDULE: TimeSlot[] = [
+const SCHEDULE: ScheduleRow[] = [
   { 
-    time: "08:00 - 09:00", 
+    time: "08:00-09:00", 
     days: {
-      mon: { subject: "Mathematics", teacher: "Zia Khan", room: "Node 101", type: 'lecture' },
-      tue: { subject: "Physics", teacher: "Sarah A.", room: "Lab 02", type: 'lecture' },
-      wed: { subject: "Urdu", teacher: "Fatima", room: "Node 105", type: 'lecture' },
-      thu: { subject: "Math", teacher: "Zia Khan", room: "Node 101", type: 'lecture' },
-      fri: { subject: "English", teacher: "Usman G.", room: "Hall B", type: 'lecture' },
-      sat: { subject: "Revision", teacher: "System", room: "Online", type: 'test' },
+      mon: { subject: "Advanced Math", teacher: "Zia Khan", room: "N-101", type: 'lecture', code: 'MTH-401' },
+      tue: { subject: "Quantum Phys", teacher: "Sarah A.", room: "L-02", type: 'lab', code: 'PHY-302' },
+      wed: { subject: "Modern Comp", teacher: "Bilal R.", room: "T-50", type: 'lecture', code: 'CS-505' },
+      thu: { subject: "English Lit", teacher: "Fatima A.", room: "H-12", type: 'lecture', code: 'ENG-101' },
+      fri: { subject: "Organic Chem", teacher: "Usman G.", room: "N-108", type: 'lecture', code: 'CHM-202' },
     }
   },
+  { time: "10:00-10:30", isBreak: true, label: "REFRESHMENT BREAK" },
   { 
-    time: "09:00 - 10:00", 
+    time: "10:30-11:30", 
     days: {
-      mon: { subject: "Physics", teacher: "Sarah A.", room: "Node 102", type: 'lecture' },
-      tue: { subject: "Math", teacher: "Zia Khan", room: "Node 101", type: 'lecture' },
-      wed: { subject: "English", teacher: "Usman G.", room: "Node 104", type: 'lecture' },
-      thu: { subject: "Physics", teacher: "Sarah A.", room: "Lab 01", type: 'lecture' },
-      fri: { subject: "Islamiyat", teacher: "Ahmed", room: "Node 108", type: 'lecture' },
-      sat: { subject: "Weekly Test", teacher: "Admin", room: "Exam Hall", type: 'test' },
+      mon: { subject: "Physics Lab", teacher: "Sarah A.", room: "L-02", type: 'lab', code: 'PHY-302' },
+      tue: { subject: "History", teacher: "Ahmed R.", room: "N-105", type: 'lecture', code: 'HIS-201' },
+      wed: { subject: "Calculus", teacher: "Zia Khan", room: "N-101", type: 'lecture', code: 'MTH-402' },
+      thu: { subject: "Biology", teacher: "Sofia M.", room: "L-03", type: 'lecture', code: 'BIO-101' },
+      fri: { subject: "CS Practice", teacher: "Bilal R.", room: "T-50", type: 'lab', code: 'CS-506' },
     }
-  },
-  { 
-    time: "10:00 - 10:30", 
-    days: {
-      mon: { subject: "BREAK", teacher: "", room: "Café", type: 'break' },
-      tue: { subject: "BREAK", teacher: "", room: "Café", type: 'break' },
-      wed: { subject: "BREAK", teacher: "", room: "Café", type: 'break' },
-      thu: { subject: "BREAK", teacher: "", room: "Café", type: 'break' },
-      fri: { subject: "BREAK", teacher: "", room: "Café", type: 'break' },
-      sat: { subject: "BREAK", teacher: "", room: "Café", type: 'break' },
-    } 
   },
 ];
 
 export default function EliteTimetableMatrix() {
-  const [mounted, setMounted] = useState(false);
   const [activeClass, setActiveClass] = useState('Grade 9-Alpha');
-
+  const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
   if (!mounted) return null;
 
   return (
-    <div className="p-4 lg:p-8 space-y-8 animate-in fade-in duration-700 max-w-[1800px] mx-auto overflow-x-hidden">
+    <div className="flex flex-col h-full w-full bg-[#FDFDFD] overflow-hidden animate-in fade-in duration-500 font-sans">
       
-      {/* 1. HEADER */}
-      <header className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden">
-        <div className="space-y-2 relative z-10">
-          <div className="flex items-center gap-3">
-            <Badge className="bg-indigo-600 text-white border-none font-black text-[9px] tracking-widest px-2 py-0.5">MATRIX v4.0</Badge>
-            <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-               <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Node Sync
+      {/* 1. TOP HEADER (ELITE COMPACT FIX) */}
+      <header className="shrink-0 h-[52px] border-b border-slate-100 bg-white flex items-center px-4 lg:px-6 z-20 overflow-hidden">
+        <div className="flex flex-col min-w-0 flex-1">
+            <div className="flex items-center gap-2 text-[8px] font-bold text-indigo-600 uppercase tracking-[0.2em] leading-none">
+                SCHEDULING <span className="text-slate-300">•</span> <span className="text-slate-400">ACTIVE_NODE</span>
             </div>
-          </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter leading-none italic">Master <span className="text-indigo-600">Scheduling</span></h1>
+            <h1 className="text-sm font-black text-slate-900 tracking-tighter mt-1 uppercase italic leading-none truncate">
+                Timetable <span className="text-indigo-600 not-italic">Matrix</span>
+            </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 relative z-10">
-           <Button variant="outline" className="h-10 rounded-xl border-slate-200 text-[10px] font-black uppercase tracking-widest gap-2">
-              <Download size={16} /> Export
+        <div className="flex items-center gap-2 shrink-0 ml-4">
+           <Button variant="outline" className="hidden sm:flex h-7 text-[9px] font-bold uppercase border-slate-200 bg-white px-2 hover:bg-slate-50">
+              <Download size={12} className="mr-1" /> Export
            </Button>
-           <Button className="bg-slate-900 hover:bg-indigo-600 shadow-xl h-10 rounded-xl font-black uppercase text-[10px] gap-2 tracking-widest px-6 transition-all">
-              <Plus size={18} strokeWidth={3} /> New Slot
-           </Button>
+           <Button className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase shadow-md active:scale-95 transition-all px-3 rounded-lg flex-shrink-0">
+                <Plus size={12} className="mr-1" strokeWidth={3} /> Create Node
+            </Button>
         </div>
       </header>
 
-      {/* 2. CLASS SELECTOR */}
-      <div className="flex gap-2 bg-white/80 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
-         {['Grade 9-Alpha', 'Grade 9-Beta', 'Grade 10-A', 'Grade 11-C'].map((cls) => (
-           <button 
-              key={cls}
-              onClick={() => setActiveClass(cls)}
-              className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeClass === cls ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
-           >
-              {cls}
-           </button>
-         ))}
-      </div>
-
-      {/* 3. THE MASTER GRID */}
-      <Card className="border-none shadow-2xl rounded-[40px] bg-white overflow-hidden">
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[1200px]">
-            <thead>
-              <tr className="bg-slate-50/50 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] border-b border-slate-100">
-                <th className="p-6 border-r border-slate-100 w-44">Time Slot</th>
-                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                  <th key={day} className="p-6 text-center">{day}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {SCHEDULE.map((row, i) => (
-                <tr key={i} className="group">
-                  <td className="p-6 border-r border-slate-50 bg-slate-50/20">
-                    <div className="flex items-center gap-3">
-                       <div className="p-2 bg-white rounded-lg shadow-sm text-indigo-600 border border-slate-100"><Clock size={16} /></div>
-                       <div>
-                          <p className="text-xs font-black text-slate-900 leading-none mb-1">{row.time}</p>
-                          <Badge variant="outline" className="text-[7px] font-black border-none bg-indigo-50 text-indigo-400 px-1 py-0">SYNCED</Badge>
-                       </div>
-                    </div>
-                  </td>
-                  
-                  {['mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map((day) => {
-                    const data = row.days[day];
-                    if (!data) return <td key={day} className="p-2"></td>;
-
-                    return (
-                      <td key={day} className="p-3 min-w-[200px]">
-                        <motion.div 
-                           whileHover={{ y: -2 }}
-                           className={`p-4 rounded-[24px] border transition-all cursor-default ${
-                              data.type === 'break' 
-                              ? 'bg-slate-50 border-dashed border-slate-200 text-center py-6' 
-                              : 'bg-white border-slate-100 shadow-sm hover:border-indigo-200 hover:shadow-xl'
-                           }`}
-                        >
-                           {data.type === 'break' ? (
-                              <div className="opacity-60">
-                                 <span className="text-[10px] font-black tracking-widest uppercase text-slate-400">{data.subject}</span>
-                              </div>
-                           ) : (
-                              /* FIXED: Clean nested structure here */
-                              <div className="space-y-3">
-                                 <div className="flex justify-between items-start">
-                                    <Badge className={`text-[8px] font-black border-none px-1.5 py-0 rounded-md ${
-                                       data.type === 'lecture' ? 'bg-indigo-50 text-indigo-600' : 'bg-amber-50 text-amber-600'
-                                    }`}>
-                                       {data.type.toUpperCase()}
-                                    </Badge>
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{data.room}</span>
-                                 </div>
-                                 <h3 className="text-[13px] font-black text-slate-800 leading-tight transition-colors uppercase">{data.subject}</h3>
-                                 <div className="flex items-center justify-between border-t border-slate-50 pt-3">
-                                    <div className="flex items-center gap-2">
-                                       <Avatar className="size-6 border-2 border-white shadow-sm">
-                                          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${data.teacher}`} />
-                                          <AvatarFallback className="text-[7px] font-bold">T</AvatarFallback>
-                                       </Avatar>
-                                       <p className="text-[10px] font-bold text-slate-400">{data.teacher}</p>
-                                    </div>
-                                    <MoreHorizontal size={14} className="text-slate-300 hover:text-indigo-600" />
-                                 </div>
-                              </div>
-                           )}
-                        </motion.div>
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* 2. SCROLLABLE AREA */}
+      <main className="flex-1 overflow-y-auto p-4 scrollbar-hide space-y-4 bg-slate-50/20">
+        
+        {/* KPI ROW (Ultra Compact Dashboard Style) */}
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-2.5 max-w-[1600px] mx-auto">
+           <DashStat label="Slots" value="42" trend="+4" color="indigo" icon={<LayoutGrid size={12}/>}/>
+           <DashStat label="Presence" value="98%" trend="OK" color="emerald" icon={<Users size={12}/>}/>
+           <DashStat label="Faculty" value="12" trend="MAX" color="blue" icon={<GraduationCap size={12}/>}/>
+           <DashStat label="Load" value="84%" trend="+12" color="purple" icon={<Zap size={12}/>}/>
+           <DashStat label="Clashes" value="Zero" trend="SEC" color="orange" icon={<AlertCircle size={12}/>}/>
+           <DashStat label="Status" value="Live" trend="v4" color="rose" icon={<Timer size={12}/>}/>
         </div>
-      </Card>
 
-      {/* 4. FOOTER STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-20">
-         <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5">
-            <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600"><User size={20}/></div>
-            <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Faculty Load</p><p className="text-lg font-black text-slate-900">12 Nodes Active</p></div>
-         </div>
-         <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5">
-            <div className="p-4 bg-emerald-50 rounded-2xl text-emerald-600"><BookOpen size={20}/></div>
-            <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Slots</p><p className="text-lg font-black text-slate-900">42 Sessions / Week</p></div>
-         </div>
-         <div className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5">
-            <div className="p-4 bg-amber-50 rounded-2xl text-amber-600"><AlertCircle size={20}/></div>
-            <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">System Health</p><p className="text-lg font-black text-slate-900">Zero Clashes</p></div>
-         </div>
-      </div>
+        {/* TOOLBAR */}
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between bg-white p-1.5 rounded-xl border border-slate-100 shadow-sm gap-4">
+           <div className="flex bg-slate-50 p-0.5 rounded-lg border border-slate-100 overflow-x-auto scrollbar-hide">
+              {['Grade 9-Alpha', 'Grade 9-Beta', 'Grade 10-A'].map((cls) => (
+                <button 
+                    key={cls}
+                    onClick={() => setActiveClass(cls)}
+                    className={cn(
+                        "px-3 py-1 rounded-md text-[8px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                        activeClass === cls ? "bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"
+                    )}
+                >
+                    {cls}
+                </button>
+              ))}
+           </div>
 
+           <div className="flex items-center gap-2 flex-1 max-w-xs justify-end">
+              <div className="relative group w-full">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-300" size={12} />
+                <input placeholder="Search node..." className="w-full h-8 pl-8 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-[9px] font-semibold outline-none focus:bg-white focus:ring-2 ring-indigo-50 transition-all" />
+              </div>
+              <Button variant="outline" className="h-8 w-8 p-0 border-slate-200 bg-white rounded-lg shrink-0"><Filter size={12}/></Button>
+           </div>
+        </div>
+
+        {/* MATRIX GRID - Re-aligned for 100% Viewport Fit */}
+        <div className="max-w-[1600px] mx-auto pb-8">
+           <Card className="border-none bg-white rounded-2xl shadow-sm ring-1 ring-slate-200/60 overflow-hidden">
+              <div className="overflow-x-auto scrollbar-hide">
+                 <table className="w-full text-left border-collapse min-w-[900px]">
+                    <thead>
+                       <tr className="bg-slate-50/50 border-b border-slate-100 text-[8px] font-black text-slate-400 uppercase tracking-[0.15em]">
+                          <th className="px-4 py-2.5 border-r border-slate-100 w-24">Time Vector</th>
+                          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => (
+                            <th key={day} className="px-4 py-2.5 text-center">{day}</th>
+                          ))}
+                       </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                       {SCHEDULE.map((row, i) => (
+                          <tr key={i} className={cn("group", row.isBreak && "bg-slate-50/20")}>
+                             <td className="px-4 py-2 border-r border-slate-100 bg-slate-50/10 text-center">
+                                <span className="text-[9px] font-black text-slate-800 tracking-tighter tabular-nums leading-none">{row.time}</span>
+                             </td>
+
+                             {row.isBreak ? (
+                                <td colSpan={5} className="p-1.5 text-center">
+                                   <div className="py-1 px-4 rounded-lg border border-dashed border-slate-200 bg-white/40 inline-block">
+                                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] italic">{row.label}</span>
+                                   </div>
+                                </td>
+                             ) : (
+                                ['mon', 'tue', 'wed', 'thu', 'fri'].map((day) => {
+                                   const data = (row as RegularRow).days[day];
+                                   return (
+                                      <td key={day} className="p-1.5">
+                                         <ScheduleNode node={data} />
+                                      </td>
+                                   )
+                                })
+                             )}
+                          </tr>
+                       ))}
+                    </tbody>
+                 </table>
+              </div>
+           </Card>
+        </div>
+      </main>
     </div>
   );
+}
+
+// --- KPI COMPONENT (Mini Dashboard Style) ---
+function DashStat({ label, value, trend, color, icon }: any) {
+    const colors: any = {
+        indigo: "bg-indigo-50 text-indigo-600",
+        emerald: "bg-emerald-50 text-emerald-600",
+        blue: "bg-blue-50 text-blue-600",
+        purple: "bg-purple-50 text-purple-600",
+        orange: "bg-orange-50 text-orange-600",
+        rose: "bg-rose-50 text-rose-600",
+    }
+    return (
+        <Card className="p-3 rounded-xl bg-white border-none shadow-sm ring-1 ring-slate-100 flex flex-col justify-between hover:shadow-md transition-all h-[85px]">
+            <div className="flex justify-between items-start w-full">
+                <div className={cn("p-1.5 rounded-lg shadow-xs", colors[color])}>{icon}</div>
+                <span className={cn("text-[6px] font-black px-1 py-0.5 rounded uppercase", colors[color])}>{trend}</span>
+            </div>
+            <div className="mt-1">
+                <p className="text-sm font-black text-slate-900 tracking-tight leading-none">{value}</p>
+                <p className="text-[7px] font-bold text-slate-400 uppercase tracking-widest mt-1 leading-none">{label}</p>
+            </div>
+        </Card>
+    )
+}
+
+// --- SCHEDULE NODE (Super Lean Tile) ---
+function ScheduleNode({ node }: { node: any }) {
+    if (!node) return <div className="h-14 bg-slate-50/20 rounded-xl border border-dashed border-slate-100" />;
+    return (
+        <div className="p-2.5 rounded-xl bg-white border border-slate-100 shadow-xs hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer group border-l-2 border-l-indigo-500/20 hover:border-l-indigo-600 flex flex-col justify-between h-[75px]">
+            <div className="flex justify-between items-start leading-none mb-1">
+                <span className="text-[7px] font-black text-indigo-600 uppercase tracking-tighter bg-indigo-50 px-1 rounded-sm py-0.5">{node.type}</span>
+                <span className="text-[7px] font-bold text-slate-300 uppercase font-mono">{node.room}</span>
+            </div>
+            
+            <h4 className="text-[9px] font-bold text-slate-800 leading-tight uppercase group-hover:text-indigo-600 transition-colors truncate">
+                {node.subject}
+            </h4>
+
+            <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-slate-50 leading-none">
+                <div className="flex items-center gap-1 min-w-0">
+                    <div className="size-3.5 rounded-sm bg-slate-100 flex items-center justify-center text-[6px] font-black text-slate-400 uppercase shrink-0">{node.teacher.substring(0, 1)}</div>
+                    <span className="text-[7px] font-black text-slate-400 uppercase truncate">{node.teacher}</span>
+                </div>
+                <ArrowUpRight size={8} className="text-slate-200 group-hover:text-indigo-400 shrink-0" />
+            </div>
+        </div>
+    )
 }

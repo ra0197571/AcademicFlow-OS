@@ -2,187 +2,262 @@
 
 import React, { useState } from 'react';
 import { 
-  Search, Filter, MoreVertical, UserPlus, Mail, Phone, 
-  GraduationCap, Download, Trash2, MessageSquare, 
-  CheckCircle2, Eye, X, ArrowUpRight, MoreHorizontal
+  Search, UserPlus, GraduationCap, Download, Trash2, MessageSquare, 
+  Eye, MoreHorizontal, LayoutGrid, UserCheck, Clock, 
+  FileSpreadsheet, SlidersHorizontal, ArrowUpRight
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription 
-} from "@/components/ui/sheet"; // Shadcn Sheet for Quick View
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const students = [
-  { id: "STU-001", name: "Ahmed Malik", class: "9th-A", email: "ahmed@example.com", status: "Active", phone: "+92 300 1234567", date: "12 July 2024" },
-  { id: "STU-002", name: "Fatima Khan", class: "10th-B", email: "fatima@example.com", status: "Active", phone: "+92 301 7654321", date: "10 July 2024" },
-  { id: "STU-003", name: "Ali Hassan", class: "9th-A", email: "ali@example.com", status: "Inactive", phone: "+92 321 9876543", date: "05 July 2024" },
-  { id: "STU-004", name: "Zainab Bibi", class: "11th-C", email: "zainab@example.com", status: "Active", phone: "+92 333 1122334", date: "01 July 2024" },
-  { id: "STU-005", name: "Bilal Raza", class: "12th-A", email: "bilal@example.com", status: "Pending", phone: "+92 345 5566778", date: "28 June 2024" },
+  { id: "STU-001", name: "Ahmed Malik", class: "9th-A", email: "ahmed@example.com", status: "Active", phone: "+92 300 1234567", date: "12 July 2024", attendance: "98%", behavior: "Exemplary" },
+  { id: "STU-002", name: "Fatima Khan", class: "10th-B", email: "fatima@example.com", status: "Active", phone: "+92 301 7654321", date: "10 July 2024", attendance: "94%", behavior: "Good" },
+  { id: "STU-003", name: "Ali Hassan", class: "9th-A", email: "ali@example.com", status: "Inactive", phone: "+92 321 9876543", date: "05 July 2024", attendance: "82%", behavior: "Average" },
+  { id: "STU-004", name: "Zainab Bibi", class: "11th-C", email: "zainab@example.com", status: "Active", phone: "+92 333 1122334", date: "01 July 2024", attendance: "99%", behavior: "Exemplary" },
+  { id: "STU-005", name: "Bilal Raza", class: "12th-A", email: "bilal@example.com", status: "Pending", phone: "+92 345 5566778", date: "28 June 2024", attendance: "0%", behavior: "Pending" },
 ];
 
 export default function StudentsDirectory() {
   const [selectedCount, setSelectedCount] = useState(0);
   const [quickViewStudent, setQuickViewStudent] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("All");
 
   return (
-    <div className="p-4 space-y-6 animate-in fade-in duration-500 max-w-[1600px] mx-auto relative min-h-screen">
+    <div className="flex flex-col h-full bg-[#FDFDFD] overflow-hidden animate-in fade-in duration-700">
       
-      {/* 1. Top Header */}
-      <div className="flex justify-between items-center bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm">
-        <div>
-          <h1 className="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
-            <GraduationCap className="text-indigo-600 size-6" /> Students Management
-          </h1>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Real-time student database</p>
-        </div>
-        <div className="flex gap-2">
-           <Button variant="outline" size="sm" className="h-9 rounded-lg font-bold text-[10px] uppercase border-slate-100">
-              <Download size={14} className="mr-1.5" /> Export Data
-           </Button>
-           <Button className="bg-indigo-600 hover:bg-indigo-700 h-9 rounded-lg font-bold gap-2 shadow-lg shadow-indigo-100 px-5 text-white active:scale-95 transition-all">
-             <UserPlus size={14} /> <span className="text-[10px] uppercase">New Admission</span>
-           </Button>
-        </div>
-      </div>
-
-      {/* 2. Advanced Stats with Sparklines */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-         <SparklineStat label="Total Enrolled" value="1,240" trend="+12%" color="#4f46e5" />
-         <SparklineStat label="Active Now" value="1,195" trend="+5%" color="#10b981" />
-         <SparklineStat label="On Leave" value="14" trend="-2%" color="#f59e0b" />
-         <SparklineStat label="New Apps" value="28" trend="+18%" color="#8b5cf6" />
-      </div>
-
-      {/* 3. Toolbar: Tabs & Search */}
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-        <div className="flex p-1 bg-slate-100/50 rounded-xl border border-slate-200 w-full lg:w-auto">
-           {["All", "Active", "Inactive", "Pending"].map((t) => (
-             <button key={t} className={`px-5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${t === 'All' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}>{t}</button>
-           ))}
-        </div>
-        <div className="relative w-full lg:w-80 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" size={14} />
-          <input placeholder="Search by name, roll no, or phone..." className="w-full pl-10 h-10 rounded-2xl border border-slate-200 bg-white focus:ring-4 focus:ring-indigo-50 outline-none text-[11px] font-medium transition-all" />
-        </div>
-      </div>
-
-      {/* 4. Interactive Table */}
-      <Card className="border-slate-200 shadow-sm rounded-[32px] overflow-hidden bg-white">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/30 border-b border-slate-100">
-                <th className="p-5 pl-8 w-10"><Checkbox onCheckedChange={(c) => setSelectedCount(c ? students.length : 0)} className="rounded-md border-slate-300" /></th>
-                <th className="p-5 text-[10px] uppercase font-black text-slate-400 tracking-widest">Student Details</th>
-                <th className="p-5 text-[10px] uppercase font-black text-slate-400 tracking-widest">Grade</th>
-                <th className="p-5 text-[10px] uppercase font-black text-slate-400 tracking-widest">Status</th>
-                <th className="p-5 text-[10px] uppercase font-black text-slate-400 tracking-widest text-right pr-8">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {students.map((student) => (
-                <tr key={student.id} className="group hover:bg-indigo-50/20 transition-all duration-300">
-                  <td className="p-5 pl-8 w-10"><Checkbox onCheckedChange={(c) => setSelectedCount(prev => c ? prev + 1 : prev - 1)} className="rounded-md border-slate-300" /></td>
-                  <td className="p-5">
-                    <div className="flex items-center gap-4">
-                       <div className="size-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs group-hover:scale-110 transition-all border border-slate-200">
-                          {student.name.split(' ').map(n => n[0]).join('')}
-                       </div>
-                       <div>
-                          <p className="font-bold text-slate-800 text-xs">{student.name}</p>
-                          <p className="text-[10px] text-slate-400 font-medium">{student.id}</p>
-                       </div>
-                    </div>
-                  </td>
-                  <td className="p-5">
-                     <Badge variant="secondary" className="text-[9px] font-black bg-indigo-50 text-indigo-600 border-none rounded-md">{student.class}</Badge>
-                  </td>
-                  <td className="p-5">
-                     <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm ${student.status === 'Active' ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : 'bg-rose-50 text-rose-600 ring-1 ring-rose-100'}`}>{student.status}</span>
-                  </td>
-                  <td className="p-5 text-right pr-8">
-                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => setQuickViewStudent(student)} className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-indigo-600 transition-all shadow-none hover:shadow-sm" title="Quick View"><Eye size={14}/></button>
-                        <Link href={`/admin/students/${student.id}`}><button className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-indigo-600 transition-all shadow-none hover:shadow-sm" title="Full Profile"><ArrowUpRight size={14}/></button></Link>
-                        <button className="p-2 hover:bg-white rounded-lg text-slate-400 transition-all"><MoreHorizontal size={14}/></button>
-                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* 5. Floating Bulk Actions Bar (NEW) */}
-      {selectedCount > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-6 animate-in slide-in-from-bottom-10 z-50">
-           <p className="text-xs font-bold text-slate-400"><span className="text-white">{selectedCount}</span> Selected</p>
-           <div className="h-4 w-px bg-slate-700" />
-           <div className="flex gap-4">
-              <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:text-indigo-400 transition-colors"><MessageSquare size={14}/> SMS</button>
-              <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:text-indigo-400 transition-colors"><Download size={14}/> PDF</button>
-              <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-300 transition-colors"><Trash2 size={14}/> Delete</button>
+      {/* 1. TOP HEADER */}
+      <header className="shrink-0 h-[56px] border-b border-slate-100 bg-white flex items-center justify-between px-6 z-20">
+        <div className="flex items-center gap-3">
+           <div className="size-8 bg-slate-900 rounded-lg flex items-center justify-center text-white shadow-lg">
+              <GraduationCap size={16} />
            </div>
-           <button onClick={() => setSelectedCount(0)} className="p-1 hover:bg-slate-800 rounded-full transition-colors"><X size={14}/></button>
+           <div className="flex flex-col">
+              <h1 className="text-xs font-bold text-slate-800 tracking-tight leading-none uppercase italic">Registry <span className="text-indigo-600">Command</span></h1>
+              <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Lifecycle Node / Active</span>
+           </div>
         </div>
-      )}
 
-      {/* 6. Quick View Side-Sheet (NEW) */}
-      <Sheet open={!!quickViewStudent} onOpenChange={() => setQuickViewStudent(null)}>
-        <SheetContent className="w-[400px] sm:w-[540px] p-0 border-l border-slate-100">
-           <div className="h-32 bg-indigo-600 w-full" />
-           <div className="px-8 pb-8">
-              <div className="size-24 rounded-[28px] bg-white p-1 -mt-12 shadow-xl border border-slate-50 mx-auto">
-                 <div className="size-full rounded-[24px] bg-slate-100 flex items-center justify-center text-2xl font-black text-slate-400 uppercase">{quickViewStudent?.name.substring(0,2)}</div>
+        <div className="flex items-center gap-2">
+           <Button variant="outline" className="h-8 text-[9px] font-bold uppercase tracking-wider border-slate-200 bg-white">
+              <Download size={12} className="mr-2" /> Export
+           </Button>
+           <Link href="/admin/admission">
+            <Button className="h-8 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all">
+                <UserPlus size={12} className="mr-2" /> New Admission
+            </Button>
+           </Link>
+        </div>
+      </header>
+
+      {/* 2. SCROLLABLE WORKSPACE */}
+      <main className="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-6 bg-slate-50/20">
+        
+        {/* KPI CARDS - Added Premium Hover Effects */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto">
+           <PremiumStat label="Total Registry" value="1,284" trend="+12.4%" color="#6366f1" icon={<LayoutGrid size={12}/>}/>
+           <PremiumStat label="Active Nodes" value="1,195" trend="+4.2%" color="#10b981" icon={<UserCheck size={12}/>}/>
+           <PremiumStat label="Leave Log" value="14" trend="-2.1%" color="#f59e0b" icon={<Clock size={12}/>}/>
+           <PremiumStat label="In-Pipeline" value="28" trend="+18.5%" color="#8b5cf6" icon={<UserPlus size={12}/>}/>
+        </div>
+
+        {/* COMPACT TOOLBAR */}
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+           <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-100">
+              {["All", "Active", "Inactive", "Pending"].map((tab) => (
+                <button 
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={cn(
+                        "px-4 py-1 rounded-md text-[9px] font-black uppercase tracking-widest transition-all",
+                        activeTab === tab ? "bg-white text-indigo-600 shadow-sm ring-1 ring-slate-100" : "text-slate-400 hover:text-slate-600"
+                    )}
+                >
+                    {tab}
+                </button>
+              ))}
+           </div>
+
+           <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="relative flex-1 md:w-72 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors" size={12} />
+                <input placeholder="Search intelligence node..." className="w-full h-8 pl-9 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-semibold outline-none focus:bg-white focus:ring-2 ring-indigo-50 transition-all placeholder:text-slate-300" />
               </div>
-              <div className="text-center mt-4">
-                 <h2 className="text-xl font-black text-slate-900">{quickViewStudent?.name}</h2>
-                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{quickViewStudent?.id} • {quickViewStudent?.class}</p>
-                 <div className="mt-6 grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-50 rounded-2xl text-left">
-                       <p className="text-[9px] font-black text-slate-400 uppercase">Attendance</p>
-                       <p className="text-lg font-black text-slate-800">96.4%</p>
-                    </div>
-                    <div className="p-4 bg-slate-50 rounded-2xl text-left">
-                       <p className="text-[9px] font-black text-slate-400 uppercase">Behavior</p>
-                       <p className="text-lg font-black text-emerald-600">Excellent</p>
-                    </div>
+              <Button variant="outline" className="h-8 w-8 p-0 border-slate-200 bg-white"><SlidersHorizontal size={12}/></Button>
+           </div>
+        </div>
+
+        {/* TABLE - Redesigned for Elite Look */}
+        <div className="max-w-7xl mx-auto bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden mb-12">
+           <table className="w-full text-left">
+              <thead>
+                 <tr className="bg-slate-50/50 border-b border-slate-100 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                    <th className="px-6 py-4 w-10 text-center"><Checkbox className="rounded-sm" /></th>
+                    <th className="px-6 py-4">Identity Node</th>
+                    <th className="px-6 py-4">Registry Class</th>
+                    <th className="px-6 py-4">Lifecycle Status</th>
+                    <th className="px-6 py-4 text-right pr-10">Actions</th>
+                 </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                 {students.map((student) => (
+                    <tr key={student.id} className="group hover:bg-indigo-50/10 transition-all border-l-2 border-transparent hover:border-indigo-600">
+                       <td className="px-6 py-3 text-center"><Checkbox className="rounded-sm" /></td>
+                       <td className="px-6 py-3">
+                          <div className="flex items-center gap-3">
+                             <div className="size-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-[10px] border border-slate-200 uppercase group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900 transition-all">
+                                {student.name.substring(0, 2)}
+                             </div>
+                             <div>
+                                <p className="text-[11px] font-bold text-slate-900 leading-none">{student.name}</p>
+                                <p className="text-[9px] font-medium text-slate-400 mt-1 lowercase tracking-tighter">{student.email}</p>
+                             </div>
+                          </div>
+                       </td>
+                       <td className="px-6 py-3">
+                          <Badge variant="outline" className="text-[9px] font-bold border-slate-100 bg-white text-slate-500 py-0 px-2 h-5">
+                             {student.id} <span className="mx-1 opacity-20">|</span> {student.class}
+                          </Badge>
+                       </td>
+                       <td className="px-6 py-3">
+                          <div className="flex items-center gap-2">
+                             <div className={cn("size-1 rounded-full", student.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300')} />
+                             <span className={cn("text-[10px] font-bold uppercase tracking-tight", student.status === 'Active' ? 'text-emerald-600' : 'text-slate-400')}>
+                                {student.status}
+                             </span>
+                          </div>
+                       </td>
+                       <td className="px-6 py-3 text-right pr-10">
+                          <div className="flex items-center justify-end gap-2">
+                             
+                             <button 
+                                type="button"
+                                onClick={() => setQuickViewStudent(student)} 
+                                className="h-8 w-8 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-white hover:shadow-sm transition-all"
+                             >
+                                <Eye size={14}/>
+                             </button>
+                             
+                             {/* THE DROPDOWN MENU - FIXED: No asChild prop, styled the Trigger directly */}
+                             <DropdownMenu>
+                                <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-md text-slate-400 hover:text-slate-600 hover:bg-white transition-all outline-none focus:ring-0">
+                                      <MoreHorizontal size={14}/>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44 p-1 rounded-xl shadow-xl border-slate-100 z-[100] bg-white">
+                                   <DropdownMenuLabel className="text-[8px] font-black uppercase text-slate-400 px-3 py-1.5 tracking-widest">Protocol Actions</DropdownMenuLabel>
+                                   <DropdownMenuItem className="text-[10px] font-bold px-3 py-2 rounded-lg cursor-pointer flex items-center hover:bg-slate-50 outline-none">
+                                      <FileSpreadsheet size={13} className="mr-2 text-indigo-500" /> View Transcript
+                                   </DropdownMenuItem>
+                                   <DropdownMenuItem className="text-[10px] font-bold px-3 py-2 rounded-lg cursor-pointer flex items-center hover:bg-slate-50 outline-none">
+                                      <MessageSquare size={13} className="mr-2 text-emerald-500" /> Notify Guardian
+                                   </DropdownMenuItem>
+                                   <DropdownMenuSeparator className="bg-slate-50" />
+                                   <DropdownMenuItem className="text-[10px] font-bold px-3 py-2 rounded-lg text-rose-500 hover:text-rose-600 focus:bg-rose-50 cursor-pointer flex items-center outline-none">
+                                      <Trash2 size={13} className="mr-2" /> Deactivate Node
+                                   </DropdownMenuItem>
+                                </DropdownMenuContent>
+                             </DropdownMenu>
+                          </div>
+                       </td>
+                    </tr>
+                 ))}
+              </tbody>
+           </table>
+        </div>
+      </main>
+
+      {/* 3. QUICK VIEW SHEET - FIXED: Only one Close Icon (Shadcn default) */}
+      <Sheet open={!!quickViewStudent} onOpenChange={() => setQuickViewStudent(null)}>
+        <SheetContent className="w-[400px] border-l border-slate-100 p-0 overflow-hidden shadow-2xl z-[150] bg-white">
+           <div className="h-24 bg-slate-900 flex items-center px-8 relative overflow-hidden">
+              <div className="absolute inset-0 bg-indigo-600 opacity-20" />
+              <h3 className="text-white font-black uppercase tracking-widest text-[10px] z-10 italic">Intelligence Dossier</h3>
+           </div>
+           
+           <div className="px-8 -mt-8 relative z-20">
+              <div className="size-20 rounded-2xl bg-white p-1 shadow-2xl border border-slate-50 mx-auto">
+                 <div className="size-full rounded-xl bg-slate-50 flex items-center justify-center text-xl font-black text-slate-300 uppercase leading-none">
+                    {quickViewStudent?.name.substring(0, 2)}
                  </div>
-                 <Link href={`/admin/students/${quickViewStudent?.id}`} className="block mt-8">
-                    <Button className="w-full bg-slate-900 text-white rounded-xl font-bold py-6">View Full Performance Report</Button>
-                 </Link>
+              </div>
+              <div className="mt-4 text-center">
+                 <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight leading-none">{quickViewStudent?.name}</h2>
+                 <p className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mt-2 tracking-tighter">{quickViewStudent?.id} Node</p>
+                 
+                 <div className="grid grid-cols-2 gap-3 mt-8">
+                    <ProfileMetric label="Attendance Depth" value={quickViewStudent?.attendance} />
+                    <ProfileMetric label="Conduct Rating" value={quickViewStudent?.behavior} color="text-emerald-600" />
+                 </div>
+                 
+                 <div className="mt-8 pt-8 border-t border-slate-50 flex flex-col gap-2">
+                    <Link href={`/admin/students/${quickViewStudent?.id}`} className="block mt-8">
+                       <Button className="w-full bg-slate-900 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-indigo-50">
+                         Analyze Performance Node
+                       </Button>
+                    </Link>
+                    <Button variant="outline" className="w-full h-11 rounded-xl text-[10px] font-black uppercase tracking-widest border-slate-200">
+                       Download Identity Stream
+                    </Button>
+                 </div>
               </div>
            </div>
         </SheetContent>
       </Sheet>
-
     </div>
   );
 }
 
-// Sparkline Stat Component (Impressive UX)
-function SparklineStat({ label, value, trend, color }: any) {
+// PREMIUM KPI COMPONENT WITH HOVER EFFECT
+function PremiumStat({ label, value, trend, color, icon }: any) {
   const data = [{ v: 10 }, { v: 25 }, { v: 15 }, { v: 45 }, { v: 35 }, { v: 55 }];
   return (
-    <div className="p-5 rounded-[28px] bg-white border border-slate-100 shadow-sm flex items-center justify-between group hover:border-indigo-100 transition-all">
-       <div>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-          <div className="flex items-baseline gap-2">
-             <p className="text-xl font-black text-slate-900">{value}</p>
-             <span className="text-[9px] font-black text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md">{trend}</span>
+    <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm hover:border-indigo-200 hover:shadow-md hover:-translate-y-1 transition-all group overflow-hidden relative cursor-default">
+       <div className="flex justify-between items-start relative z-10">
+          <div>
+            <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-indigo-500 transition-colors">
+               {icon} {label}
+            </div>
+            <p className="text-lg font-black text-slate-900 tracking-tight leading-none">{value}</p>
+            <span className="text-[8px] font-black text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded mt-2 inline-block shadow-sm">{trend}</span>
+          </div>
+          <div className="w-12 h-10 opacity-30 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+            <ResponsiveContainer width="100%" height="100%">
+               <AreaChart data={data}>
+                <defs>
+                    <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={color} stopOpacity={0}/>
+                    </linearGradient>
+                </defs>
+                <Area type="monotone" dataKey="v" stroke={color} fill={`url(#grad-${color})`} strokeWidth={2.5} />
+               </AreaChart>
+            </ResponsiveContainer>
           </div>
        </div>
-       <div className="w-16 h-10 opacity-50 group-hover:opacity-100 transition-opacity">
-          <ResponsiveContainer width="100%" height="100%">
-             <AreaChart data={data}><Area type="monotone" dataKey="v" stroke={color} fill={color} fillOpacity={0.1} strokeWidth={2} /></AreaChart>
-          </ResponsiveContainer>
-       </div>
+       {/* Background subtle glow on hover */}
+       <div className="absolute -bottom-8 -right-8 size-20 bg-indigo-50/50 rounded-full blur-2xl group-hover:bg-indigo-100/80 transition-all duration-500" />
     </div>
   )
+}
+
+function ProfileMetric({ label, value, color = "text-slate-900" }: any) {
+    return (
+        <div className="bg-slate-50 p-4 rounded-xl text-left border border-slate-100 group hover:bg-white hover:shadow-sm transition-all">
+            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+            <p className={cn("text-xs font-black uppercase leading-none mt-1", color)}>{value}</p>
+        </div>
+    )
 }
