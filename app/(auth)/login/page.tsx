@@ -1,52 +1,119 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { GraduationCap, ArrowRight } from "lucide-react"
-import Link from "next/link"
+import React from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Smartphone, ArrowRight, ShieldCheck, Sparkles, 
+  LockKeyhole, Globe, Fingerprint, Info 
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge"; // <-- Ye miss ho gaya tha
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6">
-      <div className="flex flex-col items-center mb-10 text-center">
-        <div className="size-20 rounded-[20px] bg-[#4F46E5] flex items-center justify-center text-white mb-6 shadow-xl shadow-indigo-100">
-          <GraduationCap size={48} />
-        </div>
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight">AcademicFlow OS</h1>
-        <p className="text-slate-500 mt-2 text-lg font-medium">Welcome back to your academy</p>
-      </div>
+    <div className="min-h-screen w-full bg-[#FDFDFD] flex items-center justify-center p-6 relative overflow-hidden font-sans">
+      
+      {/* 1. ELITE BACKGROUND ELEMENTS */}
+      <div className="absolute top-0 left-0 size-[600px] bg-indigo-50/40 blur-[120px] rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 size-[500px] bg-purple-50/40 blur-[120px] rounded-full translate-x-1/3 translate-y-1/3 pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] opacity-[0.03] pointer-events-none" />
 
-      <div className="w-full max-w-[440px] bg-white rounded-[32px] border border-slate-100 shadow-sm p-10">
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Sign in with phone</h2>
-            <p className="text-slate-400 mt-2 leading-relaxed font-medium">
-              We'll send you a verification code
-            </p>
-          </div>
-          
-          <div className="space-y-6">
-            <div className="space-y-2.5">
-              <label className="text-[13px] font-bold text-slate-500 ml-1 uppercase tracking-wider">Phone Number</label>
-              <Input 
-                placeholder="+92 300 1234567" 
-                className="h-14 border-slate-200 focus:border-indigo-500 rounded-2xl px-5 text-lg font-medium"
-              />
-            </div>
-            <Link href="/otp">
-              <Button className="w-full h-14 bg-[#4F46E5] hover:bg-indigo-700 text-white rounded-2xl flex items-center justify-center gap-3 text-lg font-bold shadow-lg transition-all mt-4">
-                Send OTP <ArrowRight size={20} />
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="bg-[#F8FAFC] rounded-2xl p-5 border-2 border-dashed border-slate-200">
-            <p className="text-[11px] uppercase font-black text-slate-400 mb-1 tracking-widest">Demo Mode</p>
-            <p className="text-sm text-slate-500 font-medium leading-relaxed">Enter any 10-digit number to receive OTP</p>
-          </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-[400px] relative z-10"
+      >
+        {/* 2. BRANDING NODE */}
+        <div className="text-center mb-10">
+           <div className="size-14 bg-indigo-600 rounded-[22px] flex items-center justify-center text-white mx-auto shadow-2xl shadow-indigo-200 mb-6 ring-4 ring-white relative group">
+              <div className="absolute inset-0 bg-white/20 scale-0 group-hover:scale-100 rounded-[22px] transition-transform duration-500" />
+              <ShieldCheck size={32} strokeWidth={2.5} className="relative z-10" />
+           </div>
+           <h1 className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+              AcademicFlow <span className="text-indigo-600 font-bold not-italic">OS</span>
+           </h1>
+           <div className="flex items-center justify-center gap-2 mt-3">
+              <span className="h-px w-4 bg-slate-200" />
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Auth Terminal v2.4</p>
+              <span className="h-px w-4 bg-slate-200" />
+           </div>
         </div>
-      </div>
-      <p className="mt-10 text-[12px] text-slate-400 font-bold uppercase tracking-widest">By continuing, you agree to our Terms of Service</p>
+
+        {/* 3. LOGIN INTERFACE */}
+        <Card className="border-none shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[32px] bg-white/80 backdrop-blur-xl p-8 ring-1 ring-slate-200/50">
+           <div className="space-y-8">
+              <div>
+                <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest leading-none">Initialize Session</h2>
+                <p className="text-[11px] font-medium text-slate-400 mt-2 uppercase tracking-tight">Identity verification required for node access.</p>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-0.5">Primary Link (Phone)</label>
+                    <Badge variant="outline" className="text-[8px] border-slate-100 text-slate-300 font-bold px-1.5 py-0 uppercase">Registry_ID</Badge>
+                  </div>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors border-r pr-3 border-slate-100">
+                        <Smartphone size={16} />
+                    </div>
+                    <input 
+                      type="tel"
+                      placeholder="+92 3XX XXXXXXX" 
+                      className="w-full h-12 pl-14 pr-4 bg-slate-50/50 border border-slate-100 rounded-2xl text-[13px] font-bold text-slate-800 outline-none focus:ring-4 ring-indigo-50 focus:bg-white focus:border-indigo-200 transition-all placeholder:text-slate-300"
+                    />
+                  </div>
+                </div>
+
+                <Link href="/otp" className="block pt-2">
+                  <Button className="w-full h-12 bg-slate-900 hover:bg-indigo-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.15em] shadow-xl transition-all active:scale-95 group border-none">
+                    Send Access Code <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+              
+              {/* 4. OPERATIONAL NOTICE */}
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex gap-3 relative overflow-hidden text-left">
+                <div className="absolute top-0 right-0 p-1 opacity-[0.03] rotate-12">
+                    <Fingerprint size={48} />
+                </div>
+                <Info size={16} className="text-indigo-500 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Security Notice</p>
+                    <p className="text-[10px] text-slate-500 font-medium leading-relaxed uppercase tracking-tight">
+                        Demo Sandbox Active. Enter any valid digit node to receive virtual OTP payload.
+                    </p>
+                </div>
+              </div>
+           </div>
+        </Card>
+
+        {/* 5. PROTOCOL FOOTER */}
+        <div className="mt-10 text-center space-y-4">
+           <div className="flex items-center justify-center gap-4">
+              <FooterBadge icon={<Globe size={10}/>} text="Global_Sync" />
+              <div className="size-1 rounded-full bg-slate-200" />
+              <FooterBadge icon={<LockKeyhole size={10}/>} text="SSL_Encrypted" />
+           </div>
+           <p className="text-[9px] text-slate-300 font-bold uppercase tracking-[0.2em]">
+             System Architecture by <span className="text-slate-400">AcademicFlow Protocol</span>
+           </p>
+        </div>
+      </motion.div>
     </div>
-  )
+  );
+}
+
+// --- HELPER COMPONENT ---
+function FooterBadge({ icon, text }: { icon: React.ReactNode, text: string }) {
+    return (
+        <div className="flex items-center gap-1.5 text-slate-400">
+            {icon}
+            <span className="text-[9px] font-black uppercase tracking-widest">{text}</span>
+        </div>
+    )
 }
