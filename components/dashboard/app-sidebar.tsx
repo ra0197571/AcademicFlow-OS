@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   CalendarIcon,
   Book,
-  Settings
+  Settings,
+  Database
 } from "lucide-react"
 
 import {
@@ -68,6 +69,7 @@ const navigationData = {
       { title: "Marks Entry", url: "/teacher/marks-entry", icon: PenTool },
       { title: "Attendance", url: "/teacher/attendance", icon: CheckSquare },
       { title: "Reports", url: "/teacher/reports", icon: FileText },
+      { title: "Resources", url: "/teacher/resources", icon: Database },
     ],
   },
   student: {
