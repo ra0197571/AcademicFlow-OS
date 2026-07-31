@@ -20,7 +20,11 @@ import {
   CalendarIcon,
   Book,
   Settings,
-  Database
+  Database,
+  Compass,
+  FileCheck,
+  ClipboardCheck,
+  MessageSquare
 } from "lucide-react"
 
 import {
@@ -70,6 +74,13 @@ const navigationData = {
       { title: "Attendance", url: "/teacher/attendance", icon: CheckSquare },
       { title: "Reports", url: "/teacher/reports", icon: FileText },
       { title: "Resources", url: "/teacher/resources", icon: Database },
+      { title: "Lesson Planner", url: "/teacher/planner", icon: Compass },
+      { title: "Assignments", url: "/teacher/assignments", icon: FileCheck },
+      { title: "Exam Hub", url: "/teacher/exams", icon: ClipboardCheck },
+      { title: "Messages", url: "/teacher/messages", icon: MessageSquare },
+      { title: "Task Matrix", url: "/teacher/tasks", icon: ListTodo },  
+      { title: "My Payroll", url: "/teacher/payroll", icon: Wallet },
+      
     ],
   },
   student: {
