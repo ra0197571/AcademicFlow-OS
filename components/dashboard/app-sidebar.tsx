@@ -24,7 +24,9 @@ import {
   Compass,
   FileCheck,
   ClipboardCheck,
-  MessageSquare
+  MessageSquare,
+  Timer,
+  Activity
 } from "lucide-react"
 
 import {
@@ -84,16 +86,20 @@ const navigationData = {
     ],
   },
   student: {
-    roleName: "Student",
-    navMain: [
-      { title: "My Dashboard", url: "/student", icon: LayoutDashboard },
-      { title: "Timetable", url: "/student/timetable", icon: History },
-    ],
-    management: [
-      { title: "Results", url: "/student/results", icon: GraduationCap },
-      { title: "Fees", url: "/student/fees", icon: Wallet },
-    ],
-  }
+  roleName: "Student",
+  navMain: [
+    { title: "Dashboard", url: "/student", icon: LayoutDashboard },
+    { title: "Timetable", url: "/student/timetable", icon: Timer },
+    { title: "My Assignments", url: "/student/assignments", icon: FileCheck },
+     { title: "Attendance Log", url: "/student/attendance", icon: Activity },
+  ],
+  management: [
+     { title: "Exam Center", url: "/student/exams", icon: ClipboardCheck }, 
+    { title: "Academic Results", url: "/student/results", icon: GraduationCap },
+    { title: "Fee Ledger", url: "/student/fees", icon: Wallet },
+    { title: "Resource Vault", url: "/student/resources", icon: Database },
+  ],
+}
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
